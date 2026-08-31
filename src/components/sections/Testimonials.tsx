@@ -1,71 +1,81 @@
 import FeaturedTestimonial from "@/components/testimonials/FeaturedTestimonial";
 import TestimonialsGrid from "@/components/testimonials/TestimonialsGrid";
-import SectionAtmosphere from "@/components/ui/SectionAtmosphere";
 import { testimonials, testimonialsCta } from "@/config/testimonials";
-import { resolveHomepageBackground } from "@/lib/backgrounds";
 
 export default function Testimonials() {
-  const background = resolveHomepageBackground("testimonials");
-  const featuredTestimonial = testimonials.find((testimonial) => testimonial.featured);
-  const supportingTestimonials = testimonials.filter((testimonial) => !testimonial.featured);
+  const verifiedTestimonials = testimonials.filter((testimonial) => !testimonial.isPlaceholder);
+  const featuredTestimonial =
+    verifiedTestimonials.find((testimonial) => testimonial.featured) ?? verifiedTestimonials[0];
+  const supportingTestimonials = featuredTestimonial
+    ? verifiedTestimonials.filter((testimonial) => testimonial.id !== featuredTestimonial.id)
+    : [];
+  const hasVerifiedTestimonials = Boolean(featuredTestimonial);
 
   return (
-    <section className="relative overflow-hidden bg-[#080807] py-28 sm:py-36 lg:py-44" id="testimonials">
-      <div className="pointer-events-none absolute inset-0 opacity-[.28] [background-image:linear-gradient(rgba(255,255,255,.032)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.032)_1px,transparent_1px)] [background-size:72px_72px]" />
-      <div className="pointer-events-none absolute left-1/2 top-32 h-[560px] w-[760px] -translate-x-1/2 rounded-full bg-[#d8bd79]/[.045] blur-[170px]" />
-      <div className="pointer-events-none absolute -left-64 bottom-0 h-[620px] w-[620px] rounded-full bg-white/[.025] blur-[180px]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-black/55 to-transparent" />
-      <SectionAtmosphere background={background} variant="editorial" />
+    <section className="relative overflow-hidden bg-[#0d0d0b] py-20 sm:py-28 lg:py-32" id="testimonials">
+      <div className="pointer-events-none absolute inset-0 opacity-[.18] [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] [background-size:72px_72px]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#d8bd79]/40 to-transparent" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(300px,.68fr)] lg:gap-20">
+        <div className="grid items-end gap-7 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,.58fr)] lg:gap-16">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[.48em] text-[#d8bd79] sm:text-xs sm:tracking-[.62em]">
-              Customer Testimonials
+            <p className="text-[10px] font-bold uppercase tracking-[.32em] text-[#d8bd79] sm:text-xs sm:tracking-[.42em]">
+              What Our Customers Say
             </p>
-            <h2 className="mt-5 max-w-4xl text-balance text-4xl font-semibold tracking-[-.05em] text-white sm:mt-7 sm:text-5xl md:text-6xl lg:text-7xl">
-              The Experience Matters, Too.
+            <h2 className="mt-4 max-w-4xl text-balance text-4xl leading-[.96] tracking-[-.025em] text-white [font-family:var(--font-bebas)] sm:mt-5 sm:text-5xl md:text-6xl lg:text-7xl">
+              {hasVerifiedTestimonials
+                ? "Trusted by Homeowners Across Wisconsin"
+                : "Customer Feedback, Published With Care"}
             </h2>
-            <p className="mt-6 max-w-2xl text-pretty text-base leading-7 text-white/62 sm:mt-8 sm:text-lg sm:leading-8">
-              The best perspective on a roofing project comes from the homeowner. Published customer feedback will be added here with permission to share it.
-            </p>
           </div>
 
-          <aside className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[.035] p-6 shadow-[0_20px_60px_rgba(0,0,0,.24)] backdrop-blur-md sm:rounded-[30px] sm:p-7">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#d8bd79]/80 to-transparent" />
-            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#d8bd79]/10 blur-3xl" />
-            <div className="relative">
-              <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/42">Review standard</p>
-              <p className="mt-6 text-2xl font-medium leading-tight tracking-[-.035em] text-white sm:text-3xl">
-                Real feedback, published with care.
+          <div className="lg:pb-1">
+            <p className="max-w-xl text-sm leading-7 text-white/62 sm:text-base sm:leading-8">
+              {hasVerifiedTestimonials
+                ? "Read approved homeowner feedback about the CM Roofing project experience."
+                : "Approved customer reviews have not been added to the website yet. Sample names, ratings, and quotes are not shown as real feedback."}
+            </p>
+            {testimonialsCta.href ? (
+              <a
+                className="mt-6 inline-flex min-h-11 items-center gap-3 border-b border-[#d8bd79]/55 pb-1 text-[10px] font-bold uppercase tracking-[.18em] text-[#ead7a3] transition-colors hover:border-[#ead7a3] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ead7a3]"
+                href={testimonialsCta.href}
+              >
+                {testimonialsCta.label}
+                <span aria-hidden="true">→</span>
+              </a>
+            ) : null}
+          </div>
+        </div>
+
+        {featuredTestimonial ? (
+          <>
+            <div className="mt-12 sm:mt-16">
+              <FeaturedTestimonial testimonial={featuredTestimonial} />
+            </div>
+            {supportingTestimonials.length > 0 ? (
+              <div className="mt-4 sm:mt-5">
+                <TestimonialsGrid testimonials={supportingTestimonials} />
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className="relative mt-10 overflow-hidden rounded-[26px] border border-[#d8bd79]/20 bg-[#14130f]/82 p-6 shadow-[0_22px_65px_rgba(0,0,0,.28)] sm:mt-12 sm:rounded-[30px] sm:p-8 lg:grid lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center lg:gap-8 lg:p-10">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d8bd79]/30 bg-[#d8bd79]/10 text-3xl leading-none text-[#ead7a3] sm:h-16 sm:w-16 sm:text-4xl" aria-hidden="true">
+              &ldquo;
+            </div>
+            <div className="mt-6 lg:mt-0">
+              <p className="text-[9px] font-bold uppercase tracking-[.2em] text-[#d8bd79]">
+                Reviews pending approval
               </p>
-              <p className="mt-4 text-sm leading-6 text-white/62">
-                Every review in this section is currently a clearly labeled layout placeholder until approved customer feedback is available.
+              <h3 className="mt-3 text-2xl font-semibold tracking-[-.035em] text-white sm:text-3xl">
+                Verified customer reviews will appear here.
+              </h3>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-white/60 sm:text-base">
+                CM Roofing will publish customer feedback after the review text and attribution are approved for use.
               </p>
             </div>
-          </aside>
-        </div>
-
-        {featuredTestimonial && <div className="mt-14 sm:mt-20"><FeaturedTestimonial testimonial={featuredTestimonial} /></div>}
-
-        <div className="mt-4 sm:mt-5">
-          <TestimonialsGrid testimonials={supportingTestimonials} />
-        </div>
-
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:mt-12 sm:flex-row sm:pt-10">
-          <p className="max-w-xl text-center text-sm leading-6 text-white/48 sm:text-left">
-            Replace sample reviews and the pending link in the testimonial configuration once customer permission and the Google Reviews destination are confirmed.
-          </p>
-          {testimonialsCta.href ? (
-            <a className="rounded-full border border-[#d8bd79]/45 bg-[#d8bd79]/10 px-6 py-3 text-[10px] font-semibold uppercase tracking-[.16em] text-[#ead7a3] transition duration-300 hover:-translate-y-0.5 hover:border-[#ead7a3] hover:bg-[#d8bd79]/20 motion-reduce:transform-none motion-reduce:transition-none" href={testimonialsCta.href}>
-              {testimonialsCta.label}
-            </a>
-          ) : (
-            <button aria-disabled="true" className="rounded-full border border-white/15 bg-white/[.035] px-6 py-3 text-[10px] font-semibold uppercase tracking-[.16em] text-white/55" title={testimonialsCta.pendingLabel} type="button">
-              {testimonialsCta.label}
-            </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );

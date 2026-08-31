@@ -1,38 +1,125 @@
-import { serviceImageDirectories, type ServiceConfig } from "./types";
+import type { ServiceConfig, ServiceImage } from "./types";
+
+const sidingImage: ServiceImage = {
+  src: "/images/services/siding.webp",
+  alt: "Blue residential siding with white trim and stone accents",
+  objectPosition: "52% 48%",
+  mobileObjectPosition: "57% 48%",
+};
 
 export const sidingService: ServiceConfig = {
   slug: "siding",
   name: "Siding",
-  eyebrow: "Exterior cladding",
-  heroTitle: "A Cleaner Envelope, Considered From Every Angle.",
-  heroDescription: "Siding shapes the way a home reads from the street while helping define how its exterior layers are planned together.",
-  heroIndicators: ["Elevation planning", "Color direction", "Trim details"],
-  theme: { id: "architectural", heroAlignment: "end", introLayout: "image-left", benefitsLayout: "editorial", processLayout: "steps", galleryLayout: "panorama", accent: "#ead7a3" },
-  imageDirectories: serviceImageDirectories("siding"),
-  intro: { eyebrow: "An exterior composition", title: "The finish is part of the architecture.", description: "Siding choices influence proportion, shadow lines, color relationships, and the details around openings and rooflines.", supporting: "A focused plan makes it easier to see how materials and details work as one exterior composition." },
-  benefits: {
-    eyebrow: "Designed to work together", title: "Better curb appeal starts with better coordination.", description: "The strongest exterior updates consider the field, trim, transitions, and surrounding details together.",
+  theme: {
+    id: "architectural",
+    heroLayout: "editorial-right",
+    heroAlignment: "end",
+    introLayout: "text-only",
+    optionsLayout: "columns",
+    processLayout: "steps",
+    galleryLayout: "panorama",
+    accent: "#ead7a3",
+  },
+  hero: {
+    eyebrow: "Residential & commercial siding",
+    title: "Plan a Siding Update That Fits the Whole Property.",
+    description:
+      "CM Roofing installs vinyl and steel siding for replacement, upgrades, and new construction throughout Central Wisconsin.",
+    indicators: ["Material direction", "Elevation planning", "Trim coordination"],
+    image: sidingImage,
+  },
+  intro: {
+    eyebrow: "An exterior system",
+    title: "Choose the field material with the full home in view.",
+    description:
+      "The siding color gets attention first, but corners, openings, trim widths, transitions, and fixed materials shape the finished result. Reviewing each elevation helps those choices read as one design.",
+    supporting:
+      "Start with the roof, windows, masonry, and other fixed elements; they give the new siding palette useful boundaries.",
+  },
+  options: {
+    eyebrow: "Siding services",
+    title: "Installation, replacement, and upgrades for the exterior.",
+    description: "Choose the material and project direction that fits the existing exterior, desired appearance, and planned scope.",
     items: [
-      { id: "elevations", icon: "measure", title: "Elevation awareness", description: "Review the home from multiple viewpoints before committing to a direction.", detail: "A broader view of proportion and rhythm." },
-      { id: "palette", icon: "finish", title: "Color relationships", description: "Consider siding, trim, roof, and accent colors as a coordinated palette.", detail: "A clear exterior language." },
-      { id: "transitions", icon: "detail", title: "Purposeful transitions", description: "Give corners, openings, and material changes the same attention as large wall planes.", detail: "The edge details carry the composition." },
-      { id: "envelope", icon: "layers", title: "Layered exterior thinking", description: "Discuss the visible finish in the context of the exterior assembly behind it.", detail: "A plan that sees beyond the surface." },
+      {
+        id: "vinyl",
+        title: "Vinyl Siding Installation",
+        description: "Coordinate the siding profile, color, trim, openings, and transitions as part of the exterior plan.",
+      },
+      {
+        id: "steel",
+        title: "Steel Siding Installation",
+        description: "Plan steel siding alongside the property's architecture, trim, openings, and adjacent exterior finishes.",
+      },
+      {
+        id: "replacement",
+        title: "Siding Replacement",
+        description: "Review existing conditions and define the wall areas, removal, transitions, and finishing details included in the work.",
+      },
+      {
+        id: "new-construction",
+        title: "New Construction Siding",
+        description: "Coordinate siding with openings, rooflines, trim, and the build schedule while the exterior is being planned.",
+      },
+      {
+        id: "upgrades",
+        title: "Siding Upgrades",
+        description: "Update selected siding areas, trim, or exterior details within a clearly defined improvement scope.",
+      },
     ],
   },
-  process: { eyebrow: "A visual path", title: "Move from elevation to finish with intent.", description: "The process balances the architectural questions first, then refines the visible details.", steps: [
-    { id: "observe", label: "01", icon: "measure", title: "Read the elevations", description: "Look at proportion, existing elements, and the parts of the exterior that frame the home." },
-    { id: "compose", label: "02", icon: "finish", title: "Build a palette", description: "Compare field, trim, and accent directions in the context of the full exterior." },
-    { id: "detail", label: "03", icon: "detail", title: "Refine the edges", description: "Review corners, openings, roofline transitions, and the details that finish the composition." },
-    { id: "review", label: "04", icon: "shield", title: "Review the plan", description: "Confirm the project direction before moving into installation scheduling and preparation." },
-  ] },
-  beforeAfter: { eyebrow: "Exterior transformation", title: "A new exterior, seen as a whole.", description: "Reserve this comparison for approved views that show how finish, trim, and proportion come together.", beforeLabel: "Existing elevation", afterLabel: "Refined exterior" },
-  gallery: { eyebrow: "Siding work", title: "Space for the full elevation and the fine details.", description: "Add approved exterior, trim, and close-detail photography as projects are documented." },
-  faq: { eyebrow: "Siding questions", title: "Make the visual decisions with context.", description: "A useful conversation should connect style preferences with the home's existing architecture.", items: [
-    { id: "color", question: "How should I approach siding and trim color selection?", answer: "Begin with the home's fixed elements and the way each elevation receives light. Comparing the palette together provides more useful context than choosing a field color in isolation." },
-    { id: "scope", question: "What exterior details should be part of the discussion?", answer: "Openings, corners, rooflines, trim transitions, and any adjacent materials are all worth reviewing as part of the overall composition." },
-    { id: "planning", question: "Can the project be planned around a specific design direction?", answer: "Yes. The desired character of the exterior can guide the conversation while practical material and detail choices are considered." },
-  ] },
-  cta: { eyebrow: "Shape the exterior", title: "Bring a clearer design direction to the first conversation.", description: "Share the elevations, materials, or visual questions that matter most to your project." },
+  trust: {
+    eyebrow: "Why choose CM Roofing",
+    title: "Keep design decisions connected to the installation scope.",
+    description: "A focused process makes the visual choices and the work areas easier to understand before scheduling.",
+    items: [
+      { id: "elevations", title: "Elevation-by-elevation review", description: "Look beyond the front facade to the corners, openings, and transitions around the home." },
+      { id: "palette", title: "Coordinated finish direction", description: "Consider siding, trim, roof, masonry, and other fixed elements in the same palette." },
+      { id: "scope", title: "Defined work areas", description: "Clarify the elevations and exterior details included in the siding scope." },
+      { id: "communication", title: "Project communication", description: "Keep material decisions and preparation details visible as the project moves toward installation." },
+    ],
+  },
+  process: {
+    eyebrow: "The siding process",
+    title: "From existing elevations to a finished exterior.",
+    description: "Five steps keep material choices, scope, preparation, and finishing details aligned.",
+    steps: [
+      { id: "review", label: "01", icon: "measure", title: "Review", description: "Walk the elevations and note existing materials, openings, transitions, and areas of concern." },
+      { id: "select", label: "02", icon: "finish", title: "Select", description: "Compare material, profile, color, and trim directions with the whole exterior in view." },
+      { id: "scope", label: "03", icon: "guide", title: "Define", description: "Confirm the wall areas, removal, preparation, and finishing details included in the project." },
+      { id: "install", label: "04", icon: "layers", title: "Install", description: "Complete the agreed siding work and its coordinated corner, opening, and transition details." },
+      { id: "walkthrough", label: "05", icon: "shield", title: "Walk through", description: "Review the completed elevations and the items included in the project scope." },
+    ],
+  },
+  faq: {
+    eyebrow: "Siding questions",
+    title: "Plan the exterior with context.",
+    description: "Material and design decisions are most useful when they are tied to the actual elevations and scope.",
+    items: [
+      { id: "materials", question: "Can I discuss both vinyl and steel siding?", answer: "Yes. The conversation can compare those material directions in the context of the home's design, existing exterior, desired finish, and project scope." },
+      { id: "color", question: "How should siding and trim colors be selected?", answer: "Start with fixed elements such as the roof, masonry, and windows, then review how the field and trim colors work across each elevation and in changing light." },
+      { id: "details", question: "Which details belong in a siding scope?", answer: "The wall areas, corners, openings, trim, material transitions, removal, preparation, and nearby roofline details are all useful items to clarify." },
+      { id: "coordinate", question: "Can siding be planned with soffit, fascia, or gutters?", answer: "Yes. Reviewing related roofline elements together can reduce disconnected color, transition, and scheduling decisions." },
+      { id: "warranties", question: "What siding warranties may apply?", answer: "CM Roofing provides a 5-year workmanship warranty. Many siding products include manufacturer-backed warranties of approximately 30 years, depending on the selected product, manufacturer terms, registration, and installation requirements. The workmanship and manufacturer warranties should be reviewed separately." },
+    ],
+  },
+  estimate: {
+    eyebrow: "Plan the elevations",
+    title: "Request a siding estimate.",
+    description: "Share which parts of the exterior you want to update and any material or color direction already in mind.",
+    defaultService: "Siding",
+  },
+  cta: {
+    eyebrow: "Shape the whole exterior",
+    title: "Bring the elevations into one focused plan.",
+    description: "Start with the materials, work areas, and design questions that matter to your home.",
+    image: sidingImage,
+  },
   relatedServices: ["soffit-fascia", "gutters", "roofing"],
-  seo: { title: "Siding Services", description: "Explore CM Roofing's exterior siding planning and design approach.", canonicalPath: "/services/siding" },
+  seo: {
+    title: "Siding Installation & Replacement",
+    description: "Explore vinyl and steel siding installation, siding replacement, upgrades, and new-construction siding throughout Central Wisconsin.",
+    canonicalPath: "/services/siding",
+    image: sidingImage,
+  },
 };

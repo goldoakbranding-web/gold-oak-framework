@@ -1,13 +1,14 @@
 "use client";
 
 import type { ChangeEvent, FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   ContactConfig,
   EstimateFormErrors,
   EstimateFormField,
   EstimateFormValues,
   EstimateSubmissionState,
+  ServiceOption,
 } from "@/config/contact";
 import { preferredContactOptions, serviceOptions } from "@/config/contact";
 import { business } from "@/config/business";
@@ -15,13 +16,30 @@ import FormField from "./FormField";
 
 type EstimateFormProps = {
   config: ContactConfig;
+  compact?: boolean;
+  defaultService?: ServiceOption;
 };
 
 type EstimateSubmissionResult = {
-  status: "success" | "development";
+  status: "success";
 };
 
-const initialValues: EstimateFormValues = {
+type EstimateApiError = {
+  error?: string;
+  fieldErrors?: EstimateFormErrors;
+};
+
+class EstimateSubmissionError extends Error {
+  fieldErrors?: EstimateFormErrors;
+
+  constructor(message: string, fieldErrors?: EstimateFormErrors) {
+    super(message);
+    this.name = "EstimateSubmissionError";
+    this.fieldErrors = fieldErrors;
+  }
+}
+
+const emptyValues: EstimateFormValues = {
   fullName: "",
   phone: "",
   email: "",
@@ -34,22 +52,32 @@ const initialValues: EstimateFormValues = {
   formStartedAt: 0,
 };
 
+function getInitialValues(defaultService?: ServiceOption, formStartedAt = Date.now()): EstimateFormValues {
+  return {
+    ...emptyValues,
+    serviceNeeded: defaultService ?? "",
+    formStartedAt,
+  };
+}
+
 const controlClassName =
   "min-h-13 w-full rounded-xl border border-white/12 bg-black/20 px-4 text-sm text-white outline-none transition placeholder:text-white/30 hover:border-white/22 focus:border-[#d8bd79]/75 focus:bg-black/30 focus:ring-2 focus:ring-[#d8bd79]/20 disabled:cursor-not-allowed disabled:opacity-55";
 
 function validate(values: EstimateFormValues): EstimateFormErrors {
   const errors: EstimateFormErrors = {};
   const phoneDigits = values.phone.replace(/\D/g, "");
+  const phoneRequired = values.preferredContact === "Phone" || values.preferredContact === "Text";
+  const emailRequired = values.preferredContact === "Email";
 
   if (!values.fullName.trim()) errors.fullName = "Enter your full name.";
-  if (!values.phone.trim()) {
+  if (phoneRequired && !values.phone.trim()) {
     errors.phone = "Enter a phone number.";
-  } else if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+  } else if (values.phone.trim() && (phoneDigits.length < 10 || phoneDigits.length > 15)) {
     errors.phone = "Enter a valid phone number.";
   }
-  if (!values.email.trim()) {
+  if (emailRequired && !values.email.trim()) {
     errors.email = "Enter your email address.";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+  } else if (values.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
     errors.email = "Enter a valid email address.";
   }
   if (!values.propertyLocation.trim()) errors.propertyLocation = "Enter your property address or city.";
@@ -67,24 +95,46 @@ async function submitEstimateRequest(values: EstimateFormValues): Promise<Estima
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(values),
   });
-  const payload = await response.json().catch(() => null) as { status?: "success" | "development"; error?: string } | null;
+  const payload = await response.json().catch(() => null) as (EstimateSubmissionResult & EstimateApiError) | null;
 
-  if (!response.ok || !payload?.status) throw new Error(payload?.error ?? "Unable to submit this request.");
+  if (!response.ok || payload?.status !== "success") {
+    throw new EstimateSubmissionError(payload?.error ?? "Unable to submit this request.", payload?.fieldErrors);
+  }
+
   return { status: payload.status };
 }
 
-export default function EstimateForm({ config }: EstimateFormProps) {
-  const [values, setValues] = useState<EstimateFormValues>(initialValues);
+export default function EstimateForm({ compact = false, config, defaultService }: EstimateFormProps) {
+  const [values, setValues] = useState<EstimateFormValues>(() => getInitialValues(defaultService));
   const [errors, setErrors] = useState<EstimateFormErrors>({});
   const [submissionState, setSubmissionState] = useState<EstimateSubmissionState>("idle");
+  const previousDefaultService = useRef(defaultService);
+
+  useEffect(() => {
+    if (previousDefaultService.current === defaultService) return;
+
+    previousDefaultService.current = defaultService;
+    setValues(getInitialValues(defaultService));
+    setErrors({});
+    setSubmissionState("idle");
+  }, [defaultService]);
 
   function resetValues() {
-    setValues({ ...initialValues, formStartedAt: Date.now() });
+    setValues({ ...getInitialValues(defaultService), formStartedAt: Date.now() });
   }
 
   function updateField<Field extends EstimateFormField>(field: Field, value: EstimateFormValues[Field]) {
     setValues((current) => ({ ...current, [field]: value }));
-    setErrors((current) => ({ ...current, [field]: undefined }));
+    setErrors((current) => {
+      const next = { ...current, [field]: undefined };
+
+      if (field === "preferredContact") {
+        next.phone = undefined;
+        next.email = undefined;
+      }
+
+      return next;
+    });
     if (submissionState !== "idle") setSubmissionState("idle");
   }
 
@@ -112,16 +162,19 @@ export default function EstimateForm({ config }: EstimateFormProps) {
     setSubmissionState("submitting");
 
     try {
-      const result = await submitEstimateRequest({ ...values, formStartedAt: values.formStartedAt || Date.now() });
+      const result = await submitEstimateRequest(values);
       setSubmissionState(result.status);
       resetValues();
-    } catch {
+    } catch (error) {
+      if (error instanceof EstimateSubmissionError && error.fieldErrors) setErrors(error.fieldErrors);
       setSubmissionState("error");
     }
   }
 
   const isSubmitting = submissionState === "submitting";
   const formDisabled = isSubmitting;
+  const phoneRequired = values.preferredContact === "Phone" || values.preferredContact === "Text";
+  const emailRequired = values.preferredContact === "Email";
 
   return (
     <div className="relative overflow-hidden rounded-[28px] border border-white/12 bg-white/[.045] p-5 shadow-[0_30px_90px_rgba(0,0,0,.34)] backdrop-blur-md sm:rounded-[32px] sm:p-7 lg:p-8">
@@ -133,7 +186,7 @@ export default function EstimateForm({ config }: EstimateFormProps) {
         <h3 className="mt-3 text-2xl font-medium tracking-[-.04em] text-white sm:text-3xl">{config.formTitle}</h3>
         <p className="mt-3 max-w-lg text-sm leading-6 text-white/58">{config.formDescription}</p>
 
-        <form className="mt-8 space-y-5" noValidate onFocusCapture={() => {
+        <form className={compact ? "mt-6 space-y-4 sm:mt-8 sm:space-y-5" : "mt-8 space-y-5"} noValidate onFocusCapture={() => {
           if (!values.formStartedAt) setValues((current) => ({ ...current, formStartedAt: Date.now() }));
         }} onSubmit={handleSubmit}>
           <div aria-hidden="true" className="absolute -left-[10000px] h-px w-px overflow-hidden">
@@ -149,7 +202,7 @@ export default function EstimateForm({ config }: EstimateFormProps) {
             />
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className={`grid sm:grid-cols-2 ${compact ? "gap-4 sm:gap-5" : "gap-5"}`}>
             <FormField error={errors.fullName} id="estimate-full-name" label="Full Name" required>
               <input
                 aria-describedby={errors.fullName ? "estimate-full-name-error" : undefined}
@@ -165,7 +218,7 @@ export default function EstimateForm({ config }: EstimateFormProps) {
                 value={values.fullName}
               />
             </FormField>
-            <FormField error={errors.phone} id="estimate-phone" label="Phone Number" required>
+            <FormField error={errors.phone} hint={phoneRequired ? undefined : "Optional"} id="estimate-phone" label="Phone Number" required={phoneRequired}>
               <input
                 aria-describedby={errors.phone ? "estimate-phone-error" : undefined}
                 aria-invalid={Boolean(errors.phone)}
@@ -176,15 +229,15 @@ export default function EstimateForm({ config }: EstimateFormProps) {
                 inputMode="tel"
                 name="phone"
                 onChange={handleTextChange("phone")}
-                required
+                required={phoneRequired}
                 type="tel"
                 value={values.phone}
               />
             </FormField>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
-            <FormField error={errors.email} id="estimate-email" label="Email Address" required>
+          <div className={`grid sm:grid-cols-2 ${compact ? "gap-4 sm:gap-5" : "gap-5"}`}>
+            <FormField error={errors.email} hint={emailRequired ? undefined : "Optional"} id="estimate-email" label="Email Address" required={emailRequired}>
               <input
                 aria-describedby={errors.email ? "estimate-email-error" : undefined}
                 aria-invalid={Boolean(errors.email)}
@@ -194,7 +247,7 @@ export default function EstimateForm({ config }: EstimateFormProps) {
                 id="estimate-email"
                 name="email"
                 onChange={handleTextChange("email")}
-                required
+                required={emailRequired}
                 type="email"
                 value={values.email}
               />
@@ -216,7 +269,7 @@ export default function EstimateForm({ config }: EstimateFormProps) {
             </FormField>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className={`grid sm:grid-cols-2 ${compact ? "gap-4 sm:gap-5" : "gap-5"}`}>
             <FormField error={errors.serviceNeeded} id="estimate-service" label="Service Needed" required>
               <select
                 aria-describedby={errors.serviceNeeded ? "estimate-service-error" : undefined}
@@ -253,7 +306,7 @@ export default function EstimateForm({ config }: EstimateFormProps) {
 
           <FormField hint="Optional" id="estimate-project-details" label="Project Details">
             <textarea
-              className={`${controlClassName} min-h-30 resize-y py-3`}
+              className={`${controlClassName} resize-y py-3 ${compact ? "min-h-24 sm:min-h-30" : "min-h-30"}`}
               disabled={formDisabled}
               id="estimate-project-details"
               name="projectDetails"
@@ -264,7 +317,7 @@ export default function EstimateForm({ config }: EstimateFormProps) {
           </FormField>
 
           <div>
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-black/15 p-4 transition hover:border-white/20 has-[:focus-visible]:border-[#d8bd79]/70 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#d8bd79]/20" htmlFor="estimate-consent">
+            <label className={`flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-black/15 transition hover:border-white/20 has-[:focus-visible]:border-[#d8bd79]/70 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#d8bd79]/20 ${compact ? "p-3 sm:p-4" : "p-4"}`} htmlFor="estimate-consent">
               <input
                 aria-describedby={errors.consent ? "estimate-consent-error" : undefined}
                 aria-invalid={Boolean(errors.consent)}
@@ -287,14 +340,9 @@ export default function EstimateForm({ config }: EstimateFormProps) {
               {config.successNotice}
             </div>
           )}
-          {submissionState === "development" && (
-            <div aria-live="polite" className="rounded-xl border border-[#d8bd79]/30 bg-[#d8bd79]/[.08] px-4 py-3 text-sm leading-6 text-[#f1dfb0]" role="status">
-              <p>{config.developmentNotice}</p>
-            </div>
-          )}
           {submissionState === "error" && (
             <div aria-live="assertive" className="rounded-xl border border-red-300/30 bg-red-300/[.08] px-4 py-3 text-sm leading-6 text-red-100" role="alert">
-              The form could not be prepared. Please review your details and try again.
+              {config.failureNotice}
             </div>
           )}
 

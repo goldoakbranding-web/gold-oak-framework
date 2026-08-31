@@ -6,7 +6,11 @@ import { useEffect, useRef, useState } from "react";
 import { business } from "@/config/business";
 import { serviceConfigs } from "@/config/services";
 
-export default function Navbar() {
+type NavbarProps = {
+  estimateHref?: string;
+};
+
+export default function Navbar({ estimateHref = "/#contact" }: NavbarProps) {
   const [desktopServicesOpen, setDesktopServicesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
@@ -50,7 +54,7 @@ export default function Navbar() {
             alt={`${business.name} logo`}
             width={110}
             height={110}
-            priority
+            loading="eager"
             className="h-16 w-auto max-md:h-11"
           />
         </Link>
@@ -74,28 +78,35 @@ export default function Navbar() {
             onMouseLeave={() => setDesktopServicesOpen(false)}
             ref={desktopServicesRef}
           >
-            <button
-              aria-controls="desktop-services-menu"
-              aria-expanded={desktopServicesOpen}
-              aria-haspopup="menu"
-              className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C8A24D]"
-              onClick={() => setDesktopServicesOpen((isOpen) => !isOpen)}
-              type="button"
-            >
-              Services
-              <span aria-hidden="true" className={`text-xs transition-transform ${desktopServicesOpen ? "rotate-180" : ""}`}>⌄</span>
-            </button>
+            <div className="inline-flex items-center">
+              <Link
+                className="inline-flex min-h-11 items-center text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C8A24D]"
+                href="/#services"
+                onClick={() => setDesktopServicesOpen(false)}
+              >
+                Services
+              </Link>
+              <button
+                aria-controls="desktop-services-menu"
+                aria-expanded={desktopServicesOpen}
+                aria-label={desktopServicesOpen ? "Close services menu" : "Open services menu"}
+                className="inline-flex h-11 w-8 items-center justify-center text-white transition hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C8A24D]"
+                onClick={() => setDesktopServicesOpen((isOpen) => !isOpen)}
+                type="button"
+              >
+                <span aria-hidden="true" className={`text-xs transition-transform ${desktopServicesOpen ? "rotate-180" : ""}`}>⌄</span>
+              </button>
+            </div>
 
             {desktopServicesOpen && (
               <div className="absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-3">
-                <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#10100f]/95 p-2 shadow-2xl backdrop-blur-xl" id="desktop-services-menu" role="menu">
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#10100f]/95 p-2 shadow-2xl backdrop-blur-xl" id="desktop-services-menu">
                   {serviceConfigs.map((service) => (
                     <Link
                       className="flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]"
                       href={`/services/${service.slug}`}
                       key={service.slug}
                       onClick={() => setDesktopServicesOpen(false)}
-                      role="menuitem"
                     >
                       {service.name}
                     </Link>
@@ -106,21 +117,14 @@ export default function Navbar() {
           </div>
 
           <Link
-            href="#projects"
+            href="/why-choose-cm-roofing"
             className="text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:text-[#C8A24D]"
           >
-            Projects
+            Why CM
           </Link>
 
           <Link
-            href="#about"
-            className="text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:text-[#C8A24D]"
-          >
-            About
-          </Link>
-
-          <Link
-            href="#contact"
+            href="/#contact"
             className="text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:text-[#C8A24D]"
           >
             Contact
@@ -143,30 +147,39 @@ export default function Navbar() {
         </button>
 
         {/* CTA */}
-        <Link href="#contact" className="rounded-full bg-[#C8A24D] px-8 py-3 text-sm font-bold uppercase tracking-wider text-black transition duration-300 hover:scale-105 hover:bg-[#D8B35B] max-md:inline-flex max-md:min-h-11 max-md:items-center max-md:px-4 max-md:py-2 max-md:text-[10px] max-md:tracking-[.08em] max-md:whitespace-nowrap">
+        <Link href={estimateHref} onClick={closeMobileMenu} className="rounded-full bg-[#C8A24D] px-8 py-3 text-sm font-bold uppercase tracking-wider text-black transition duration-300 hover:scale-105 hover:bg-[#D8B35B] max-md:hidden">
           Free Estimate
         </Link>
 
       </div>
 
       {mobileMenuOpen && (
-        <nav aria-label="Mobile navigation" className="absolute left-3 right-3 top-[calc(100%+0.5rem)] overflow-hidden rounded-2xl border border-white/10 bg-[#10100f]/95 p-3 shadow-2xl backdrop-blur-xl md:hidden" id="mobile-navigation">
+        <nav aria-label="Mobile navigation" className="absolute left-3 right-3 top-[calc(100%+0.5rem)] max-h-[calc(100svh-6.5rem)] overflow-y-auto overscroll-contain rounded-2xl border border-white/10 bg-[#10100f]/95 p-3 shadow-2xl backdrop-blur-xl md:hidden" id="mobile-navigation">
           <div className="space-y-1">
             <Link className="flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]" href="/" onClick={closeMobileMenu}>
               Home
             </Link>
 
             <div>
-              <button
-                aria-controls="mobile-services-menu"
-                aria-expanded={mobileServicesOpen}
-                className="flex min-h-11 w-full items-center justify-between rounded-xl px-4 text-left text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]"
-                onClick={() => setMobileServicesOpen((isOpen) => !isOpen)}
-                type="button"
-              >
-                Services
-                <span aria-hidden="true" className={`text-base transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`}>⌄</span>
-              </button>
+              <div className="flex items-center">
+                <Link
+                  className="flex min-h-11 flex-1 items-center rounded-l-xl px-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]"
+                  href="/#services"
+                  onClick={closeMobileMenu}
+                >
+                  Services
+                </Link>
+                <button
+                  aria-controls="mobile-services-menu"
+                  aria-expanded={mobileServicesOpen}
+                  aria-label={mobileServicesOpen ? "Close services menu" : "Open services menu"}
+                  className="flex h-11 w-12 items-center justify-center rounded-r-xl text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]"
+                  onClick={() => setMobileServicesOpen((isOpen) => !isOpen)}
+                  type="button"
+                >
+                  <span aria-hidden="true" className={`text-base transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`}>⌄</span>
+                </button>
+              </div>
 
               {mobileServicesOpen && (
                 <div className="mt-1 space-y-1 border-l border-white/10 pl-3" id="mobile-services-menu">
@@ -184,16 +197,13 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link className="flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]" href="#projects" onClick={closeMobileMenu}>
-              Projects
+            <Link className="flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]" href="/why-choose-cm-roofing" onClick={closeMobileMenu}>
+              Why CM
             </Link>
-            <Link className="flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]" href="#about" onClick={closeMobileMenu}>
-              About
-            </Link>
-            <Link className="flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]" href="#contact" onClick={closeMobileMenu}>
+            <Link className="flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-white/10 hover:text-[#C8A24D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]" href="/#contact" onClick={closeMobileMenu}>
               Contact
             </Link>
-            <Link className="mt-2 flex min-h-11 items-center justify-center rounded-xl bg-[#C8A24D] px-4 text-sm font-bold uppercase tracking-[0.12em] text-black transition hover:bg-[#D8B35B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]" href="#contact" onClick={closeMobileMenu}>
+            <Link className="mt-2 flex min-h-11 items-center justify-center rounded-xl bg-[#C8A24D] px-4 text-sm font-bold uppercase tracking-[0.12em] text-black transition hover:bg-[#D8B35B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A24D]" href={estimateHref} onClick={closeMobileMenu}>
               Free Estimate
             </Link>
           </div>

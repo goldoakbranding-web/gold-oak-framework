@@ -51,7 +51,11 @@ export type ResolvedHomepageBackground = Omit<HomepageBackgroundConfig, "image" 
 export const homepageBackgrounds: Record<HomepageBackgroundKey, HomepageBackgroundConfig> = {
   hero: {
     image: { directory: "/images/backgrounds/hero", alt: "" },
-    fallbackImage: { src: "/images/hero/homepage-image.png", alt: "", objectPosition: "center" },
+    fallbackImage: {
+      src: "/images/services/roofing/projects/completed-roof-replacement-drone-front.jpg",
+      alt: "",
+      objectPosition: "center",
+    },
     overlayOpacity: 0.1,
     blurPx: 0,
     brightness: 0.78,

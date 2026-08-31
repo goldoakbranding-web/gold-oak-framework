@@ -13,16 +13,16 @@ export const siteConfig = {
 
     address: business.address.value,
 
-    website: "https://cmroofing.com",
+    website: business.siteUrl,
 
-    facebook: "https://facebook.com/cmroofing",
+    facebook: business.socialLinks.find((link) => link.label === "Facebook")?.href,
   },
 
   hero: {
     title: "Roofing Built To Last",
 
     subtitle:
-      "Premium roofing, siding, gutters, soffit & fascia installations built to protect Wisconsin homes for decades.",
+      "Roofing, siding, gutters, soffit, and fascia services for homes and businesses throughout Central Wisconsin.",
 
     primaryButton: "Get Free Estimate",
 
@@ -32,6 +32,8 @@ export const siteConfig = {
   services: [
     "Roof Replacement",
     "Roof Repair",
+    "Commercial Roofing",
+    "New Construction Roofing",
     "Storm Damage",
     "Asphalt Roofing",
     "Metal Roofing",
@@ -41,9 +43,9 @@ export const siteConfig = {
   ],
 
   stats: {
-    roofs: "1000+",
-    experience: "20+",
-    reviews: "5★",
-    warranty: "Lifetime",
+    projects: "150+",
+    credentials: "Licensed & Insured",
+    estimates: "Free",
+    warranty: "5-Year Workmanship",
   },
 };

@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
+import { estimateFailureNotice } from "@/config/contact";
 import { consumeEstimateRateLimit, getRequestIdentifier } from "@/lib/lead/rate-limit";
-import { sendLeadNotifications } from "@/lib/lead/notifications";
+import { LeadDeliveryError, sendLeadNotifications } from "@/lib/lead/notifications";
 import { getEstimateLead, validateEstimateLead } from "@/lib/lead/validation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const maxBodyBytes = 20_000;
-const minimumHumanFillTimeMs = 1_200;
+const minimumHumanFillTimeMs = 750;
 
 function json(body: Record<string, unknown>, status: number, headers?: HeadersInit) {
   return NextResponse.json(body, {
@@ -53,9 +54,26 @@ export async function POST(request: Request) {
 
   try {
     const delivery = await sendLeadNotifications(getEstimateLead(validation.data));
-    return json({ status: delivery.mode }, delivery.mode === "sent" ? 201 : 202);
+
+    if (delivery.email.status === "failed" || delivery.sms.status === "failed") {
+      console.warn("[lead-notification:partial-delivery]", {
+        email: delivery.email.status,
+        sms: delivery.sms.status,
+      });
+    }
+
+    return json({ status: "success" }, 201);
   } catch (error) {
-    console.error("[lead-notification:error]", error);
-    return json({ error: "We could not send your request right now. Please call or email us directly." }, 502);
+    if (error instanceof LeadDeliveryError) {
+      console.error("[lead-notification:error]", {
+        reason: error.reason,
+        email: error.email.status,
+        sms: error.sms.status,
+      });
+      return json({ error: estimateFailureNotice }, error.reason === "not-configured" ? 503 : 502);
+    }
+
+    console.error("[lead-notification:error]", { reason: "unexpected" });
+    return json({ error: estimateFailureNotice }, 502);
   }
 }

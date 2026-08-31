@@ -1,264 +1,162 @@
 import Image from "next/image";
 import Link from "next/link";
-import SectionAtmosphere from "@/components/ui/SectionAtmosphere";
-import { resolveHomepageBackground } from "@/lib/backgrounds";
 
-const services = [
+type HomepageService = {
+  number: string;
+  title: string;
+  description: string;
+  cta: string;
+  href: string;
+  image: string;
+  imageAlt: string;
+  imagePosition?: string;
+  layout: string;
+  sizes: string;
+  featured?: boolean;
+};
+
+const services: HomepageService[] = [
   {
+    number: "01",
     title: "Roofing",
-    description:
-      "Premium roof replacements and repairs designed to protect your investment for years to come.",
-    image: "/images/services/roofing.jpg",
+    description: "Residential and commercial roof replacement, repair, asphalt, metal, and new-construction roofing.",
+    cta: "Explore Roofing",
     href: "/services/roofing",
+    image: "/images/services/roofing.jpg",
+    imageAlt: "Aerial view of a residential roofing installation in progress",
+    imagePosition: "center 48%",
+    layout: "lg:col-span-7 lg:row-span-2",
+    sizes: "(max-width: 639px) 40vw, (max-width: 1023px) 34vw, 58vw",
+    featured: true,
   },
   {
+    number: "02",
     title: "Siding",
-    description:
-      "Beautiful siding systems that improve curb appeal and energy efficiency.",
-    image: "/images/services/siding.webp",
+    description: "Vinyl and steel siding installation, replacement, and exterior upgrades.",
+    cta: "Explore Siding",
     href: "/services/siding",
+    image: "/images/services/siding.webp",
+    imageAlt: "Blue siding and white trim on a finished home exterior",
+    layout: "lg:col-span-5",
+    sizes: "(max-width: 639px) 40vw, (max-width: 1023px) 34vw, 42vw",
   },
   {
+    number: "03",
     title: "Gutters",
-    description:
-      "Seamless gutter systems that protect your foundation year-round.",
-    image: "/images/services/gutters.jpg",
+    description: "Seamless gutters, replacements, downspouts, and gutter protection solutions.",
+    cta: "Explore Gutters",
     href: "/services/gutters",
+    image: "/images/services/gutters.jpg",
+    imageAlt: "Dark metal gutter and downspout installed along a roofline",
+    layout: "lg:col-span-5",
+    sizes: "(max-width: 639px) 40vw, (max-width: 1023px) 34vw, 42vw",
   },
   {
+    number: "04",
     title: "Soffit & Fascia",
-    description:
-      "Complete roofline protection with clean, premium finishes.",
-    image: "/images/services/soffit-fascia.jpg",
+    description: "Installation, repairs, replacement, and ventilation improvements at the roofline.",
+    cta: "Explore Soffit & Fascia",
     href: "/services/soffit-fascia",
+    image: "/images/services/soffit-fascia.jpg",
+    imageAlt: "Finished soffit and fascia beneath a residential roofline",
+    layout: "lg:col-span-4",
+    sizes: "(max-width: 639px) 40vw, (max-width: 1023px) 34vw, 34vw",
   },
   {
+    number: "05",
     title: "Storm Damage",
-    description:
-      "Fast inspections and repairs after hail, wind, and severe Wisconsin weather.",
-    image: "/images/services/storm-damage.jpg",
+    description: "Storm damage assessment, restoration planning, and roof or exterior repairs.",
+    cta: "Explore Storm Damage",
     href: "/services/storm-damage",
+    image: "/images/services/storm-damage.jpg",
+    imageAlt: "Residential roof deck prepared during an active roofing project",
+    imagePosition: "center 60%",
+    layout: "lg:col-span-4",
+    sizes: "(max-width: 639px) 40vw, (max-width: 1023px) 34vw, 34vw",
+  },
+  {
+    number: "06",
+    title: "Insurance Claim Assistance",
+    description: "Construction-side documentation and project support when insurance is involved.",
+    cta: "Explore Claim Assistance",
+    href: "/services/insurance-claims",
+    image: "/images/projects/project-4.jpg",
+    imageAlt: "Overhead view documenting an active residential roof project",
+    imagePosition: "center 48%",
+    layout: "lg:col-span-4",
+    sizes: "(max-width: 639px) 40vw, (max-width: 1023px) 34vw, 34vw",
   },
 ];
 
 export default function Services() {
-  const background = resolveHomepageBackground("services");
-
   return (
-    <section
-      id="services"
-      className="relative overflow-hidden bg-[#080808] py-40"
-    >
-      {/* Premium Background */}
+    <section className="relative isolate overflow-hidden bg-[#080807] py-24 sm:py-28 lg:py-36" id="services">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_8%_10%,rgba(216,179,91,.09),transparent_33%),radial-gradient(ellipse_at_92%_72%,rgba(255,255,255,.04),transparent_32%)]" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-[8%] top-0 h-px bg-gradient-to-r from-transparent via-[#d8b35b]/45 to-transparent" />
+      <div aria-hidden="true" className="pointer-events-none absolute left-[7%] top-24 hidden h-40 w-px bg-gradient-to-b from-[#d8b35b]/50 to-transparent lg:block" />
 
-      <div className="absolute inset-0 overflow-hidden">
-
-        {/* Blueprint */}
-
-        <Image
-          src="/images/backgrounds/blueprint.png"
-          alt=""
-          fill
-          sizes="100vw"
-          className="pointer-events-none select-none object-cover opacity-[0.09] mix-blend-screen"
-        />
-
-        {/* Main Overlay */}
-
-        <div className="absolute inset-0 bg-[#090909]/78" />
-
-        {/* Spotlight */}
-
-        <div className="absolute left-1/2 top-0 h-[1500px] w-[1500px] -translate-x-1/2 rounded-full bg-white/10 blur-[260px]" />
-
-        {/* Secondary Glow */}
-
-        <div className="absolute right-[-250px] top-[-150px] h-[900px] w-[900px] rounded-full bg-white/5 blur-[240px]" />
-
-        {/* Gold Glow */}
-
-        <div className="absolute bottom-[-300px] left-[-150px] h-[700px] w-[700px] rounded-full bg-[#C3A35B]/5 blur-[240px]" />
-
-        {/* Vignette */}
-
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black" />
-
-      </div>
-
-      <SectionAtmosphere background={background} variant="services" />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
-
-        {/* Heading */}
-
-        <div className="mb-28 text-center">
-
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.7em] text-[#C3A35B]">
-            OUR SERVICES
-          </p>
-
-          <h2 className="text-5xl font-black tracking-tight text-white md:text-7xl">
-            Complete Exterior
-            <br />
-            Solutions
-          </h2>
-
-          <p className="mx-auto mt-8 max-w-3xl text-lg leading-9 text-white/60">
-            Premium roofing, siding, gutters, soffit & fascia, and storm damage
-            restoration throughout Northeast Wisconsin.
-          </p>
-
-          <div className="mx-auto mt-12 h-px w-48 overflow-hidden rounded-full bg-white/10">
-
-            <div className="h-full w-20 animate-pulse bg-[#C3A35B]" />
-
+      <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+        <header className="grid gap-7 border-b border-white/10 pb-10 sm:pb-12 lg:grid-cols-[minmax(180px,.52fr)_minmax(0,1.48fr)] lg:gap-16 lg:pb-16">
+          <div className="flex items-start gap-4">
+            <span aria-hidden="true" className="mt-[0.45rem] h-px w-8 bg-[#d8b35b]" />
+            <p className="text-[10px] font-semibold uppercase tracking-[.4em] text-[#d8b35b] sm:text-xs sm:tracking-[.55em]">
+              Our Services
+            </p>
           </div>
 
-        </div>
+          <div>
+            <h2 className="max-w-4xl text-balance text-4xl font-semibold tracking-[-.05em] text-white sm:text-5xl md:text-6xl lg:text-7xl">
+              Roofing &amp; Exterior Services
+            </h2>
+            <p className="mt-5 max-w-2xl text-pretty text-sm leading-6 text-white/60 sm:mt-7 sm:text-base sm:leading-7">
+              Choose the service that matches your project and go straight to the details that matter.
+            </p>
+          </div>
+        </header>
 
-        <div className="grid gap-8 lg:grid-cols-12">
-
-          {/* Featured Roofing */}
-
-          <div className="group relative col-span-12 h-[680px] overflow-hidden rounded-[38px] border border-white/10 backdrop-blur-md shadow-[0_35px_90px_rgba(0,0,0,.45)] transition-all duration-700 hover:-translate-y-4 hover:border-white/25">
-
-            <Link aria-label="Explore Roofing" className="absolute inset-0 z-20 rounded-[38px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C3A35B]" href={services[0].href} />
-
-            <Image
-              src={services[0].image}
-              alt={services[0].title}
-              fill
-              sizes="(max-width:768px) 100vw,1200px"
-              className="object-cover brightness-[0.92] transition duration-700 group-hover:scale-[1.08] group-hover:brightness-110"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent transition duration-500 group-hover:from-black/90" />
-
-            <div className="absolute bottom-0 left-0 p-14">
-
-              <div className="mb-6 h-1 w-20 rounded-full bg-[#C3A35B] transition-all duration-500 group-hover:w-44" />
-
-              <h3 className="text-6xl font-black text-white">
-                Roofing
-              </h3>
-
-              <p className="mt-6 max-w-xl text-lg leading-8 text-white/75">
-                Premium roof replacements and repairs built to protect your
-                investment for decades with superior craftsmanship and premium
-                materials.
-              </p>
-
-              <button className="mt-10 rounded-full border border-white/20 bg-white/10 px-9 py-4 font-semibold text-white backdrop-blur-xl transition-all duration-300 hover:bg-white hover:text-black">
-                Explore Roofing →
-              </button>
-
-            </div>
-
-          </div>          {/* Remaining Service Cards */}
-
-          {services.slice(1).map((service) => (
-            <div
-              key={service.title}
-              className="group relative col-span-12 h-[360px] overflow-hidden rounded-[34px] border border-white/10 backdrop-blur-md shadow-[0_35px_90px_rgba(0,0,0,.45)] transition-all duration-700 hover:-translate-y-4 hover:border-white/25 md:col-span-6"
-            >
-              <Link aria-label={`Explore ${service.title}`} className="absolute inset-0 z-20 rounded-[34px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C3A35B]" href={service.href} />
-              <Image
-                src={service.image}
-                alt={service.title}
-                fill
-                sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 600px"
-                className="object-cover brightness-[0.92] transition duration-700 group-hover:scale-[1.08] group-hover:brightness-110"
-              />
-
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent transition duration-500 group-hover:from-black/90" />
-
-              {/* Animated Accent */}
-              <div className="absolute left-0 top-0 h-full w-[3px] origin-top scale-y-0 bg-[#C3A35B] transition-transform duration-500 group-hover:scale-y-100" />
-
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 p-8">
-
-                <div className="mb-5 h-1 w-14 rounded-full bg-[#C3A35B] transition-all duration-500 group-hover:w-28" />
-
-                <h3 className="text-3xl font-bold text-white transition duration-300 group-hover:-translate-y-1">
-                  {service.title}
-                </h3>
-
-                <p className="mt-4 max-w-sm leading-7 text-white/70">
-                  {service.description}
-                </p>
-
-                <div className="mt-6 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-white opacity-0 transition-all duration-500 group-hover:translate-x-2 group-hover:opacity-100">
-                  Learn More
-                  <span>→</span>
+        <ol className="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:auto-rows-[17rem] lg:grid-cols-12 lg:gap-6">
+          {services.map((service) => (
+            <li className={service.layout} key={service.href}>
+              <Link
+                aria-label={`${service.cta}: ${service.description}`}
+                className="group relative grid min-h-[9.75rem] grid-cols-[40%_60%] overflow-hidden rounded-[22px] border border-white/10 bg-[#11110f] shadow-[0_18px_55px_rgba(0,0,0,.2)] transition duration-500 hover:-translate-y-1 hover:border-[#d8b35b]/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d8b35b] motion-reduce:transform-none motion-reduce:transition-none sm:block sm:min-h-0 sm:rounded-[28px] lg:h-full"
+                href={service.href}
+              >
+                <div className="relative min-h-full overflow-hidden sm:aspect-[16/9] sm:min-h-0 lg:absolute lg:inset-0 lg:aspect-auto">
+                  <Image
+                    alt={service.imageAlt}
+                    className="object-cover brightness-[.78] saturate-[.86] transition duration-700 group-hover:scale-[1.035] group-hover:brightness-[.88] motion-reduce:transform-none motion-reduce:transition-none"
+                    fill
+                    sizes={service.sizes}
+                    src={service.image}
+                    style={{ objectPosition: service.imagePosition }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/8 to-black/18 sm:bg-gradient-to-t sm:from-black/38 sm:via-transparent sm:to-black/5 lg:from-[#090908]/95 lg:via-[#090908]/25 lg:to-black/10" />
                 </div>
 
-              </div>
+                <div className="relative z-10 flex min-w-0 flex-col justify-center p-4 sm:min-h-[9.5rem] sm:p-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:min-h-0 lg:bg-gradient-to-t lg:from-[#080807] lg:via-[#080807]/88 lg:to-transparent lg:p-7 lg:pt-20">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-mono text-[9px] tracking-[.2em] text-[#d8b35b]">{service.number}</span>
+                    <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-[#d8b35b]/55 to-transparent" />
+                  </div>
 
-              {/* Subtle Hover Glow */}
-              <div className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent" />
-              </div>
+                  <h3 className={`mt-3 font-semibold leading-[1.05] tracking-[-.035em] text-white ${service.featured ? "text-2xl sm:text-3xl lg:text-5xl" : "text-xl sm:text-2xl lg:text-3xl"}`}>
+                    {service.title}
+                  </h3>
+                  <p className={`mt-2.5 text-[11px] leading-[1.55] text-white/58 sm:text-sm sm:leading-6 ${service.featured ? "lg:max-w-lg lg:text-base" : "lg:max-w-sm"}`}>
+                    {service.description}
+                  </p>
 
-            </div>
+                  <span className="mt-3 inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-[.15em] text-[#ead7a3] sm:mt-5 sm:text-[10px]">
+                    {service.cta}
+                    <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transform-none">→</span>
+                  </span>
+                </div>
+              </Link>
+            </li>
           ))}
-
-        </div>
-
-        {/* Premium Divider */}
-
-        <div className="relative mt-32 mb-20 flex justify-center">
-
-          <div className="h-px w-full max-w-3xl bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-
-          <div className="absolute -top-[2px] h-[5px] w-28 rounded-full bg-[#C3A35B]/70 blur-sm" />
-
-        </div>        {/* Call To Action */}
-
-        <div className="relative mt-8 overflow-hidden rounded-[42px] border border-white/10 bg-gradient-to-br from-[#111111] via-[#0F0F0F] to-[#090909] p-12 shadow-[0_40px_120px_rgba(0,0,0,.45)]">
-
-          {/* Background Glow */}
-
-          <div className="absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-[180px]" />
-
-          <div className="relative z-10 mx-auto max-w-4xl text-center">
-
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.6em] text-[#C3A35B]">
-              BUILT TO LAST
-            </p>
-
-            <h2 className="text-4xl font-black tracking-tight text-white md:text-6xl">
-              Protect Your Home With
-              <br />
-              Premium Craftsmanship
-            </h2>
-
-            <p className="mx-auto mt-8 max-w-3xl text-lg leading-9 text-white/65">
-              From complete roof replacements and siding installations to
-              gutters, soffit & fascia, and storm damage restoration, CM
-              Roofing delivers dependable craftsmanship and exceptional service
-              across Northeast Wisconsin.
-            </p>
-
-            <div className="mt-12 flex flex-col items-center justify-center gap-5 sm:flex-row">
-
-              <button className="rounded-full bg-white px-10 py-5 font-semibold text-black transition-all duration-300 hover:-translate-y-1 hover:bg-[#C3A35B]">
-                Get Your Free Estimate
-              </button>
-
-              <button className="rounded-full border border-white/20 bg-white/5 px-10 py-5 font-semibold text-white backdrop-blur-md transition-all duration-300 hover:bg-white/10">
-                View Recent Projects
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
+        </ol>
       </div>
-
     </section>
   );
 }

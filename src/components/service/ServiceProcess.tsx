@@ -1,60 +1,48 @@
-"use client";
-
-import { motion, useInView, useReducedMotion } from "framer-motion";
-import { useRef, useState } from "react";
 import type { ServiceConfig } from "@/config/services";
 import ServiceIcon from "./ServiceIcon";
 
 type ServiceProcessProps = { service: ServiceConfig };
 
-const layouts = {
-  rail: "lg:grid-cols-4",
-  steps: "lg:grid-cols-3",
-  path: "lg:grid-cols-4",
-} as const;
-
 export default function ServiceProcess({ service }: ServiceProcessProps) {
-  const [activeStep, setActiveStep] = useState(0);
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.17 });
-  const reduceMotion = useReducedMotion();
+  const layout = service.theme.processLayout;
+  const listClass = layout === "steps" ? "lg:grid-cols-2" : "lg:grid-cols-5";
 
   return (
-    <section className="relative overflow-hidden bg-[#080807] py-28 sm:py-36 lg:py-44" id="service-process" ref={sectionRef}>
-      <div className="pointer-events-none absolute left-0 top-[31%] h-[1px] w-full bg-gradient-to-r from-transparent via-[#d8bd79]/35 to-transparent" />
-      <div className="pointer-events-none absolute -right-48 top-0 h-[640px] w-[640px] rounded-full bg-[#d8bd79]/[.075] blur-[180px]" />
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="flex max-w-3xl flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <section className="scroll-mt-24 bg-[#11110f] py-12 sm:py-20 md:scroll-mt-36 lg:py-24" id="service-process">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="grid gap-5 lg:grid-cols-[1fr_.62fr] lg:items-end lg:gap-16">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[.48em] text-[#d8bd79] sm:text-xs sm:tracking-[.62em]">{service.process.eyebrow}</p>
-            <h2 className="mt-5 text-balance text-4xl font-semibold tracking-[-.05em] text-white sm:mt-7 sm:text-5xl md:text-6xl">{service.process.title}</h2>
+            <p className="text-[10px] font-bold uppercase tracking-[.28em] text-[#d8bd79] sm:text-xs">{service.process.eyebrow}</p>
+            <h2 className="mt-4 max-w-3xl text-balance text-4xl leading-[.98] tracking-[-.025em] text-white [font-family:var(--font-bebas)] sm:text-5xl lg:text-6xl">{service.process.title}</h2>
           </div>
-          <p className="max-w-sm text-sm leading-6 text-white/54">{service.process.description}</p>
+          <p className="max-w-xl text-sm leading-7 text-white/58 sm:text-base">{service.process.description}</p>
         </div>
 
-        <div className={`relative mt-14 grid gap-3 sm:mt-16 sm:grid-cols-2 ${layouts[service.theme.processLayout]}`}>
-          <div className="pointer-events-none absolute left-[10%] right-[10%] top-8 hidden h-px bg-gradient-to-r from-transparent via-[#d8bd79]/45 to-transparent lg:block" />
-          {service.process.steps.map((step, index) => {
-            const selected = index === activeStep;
-            return (
-              <motion.button
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: reduceMotion ? 0 : 18 }}
-                aria-pressed={selected}
-                className={`group relative z-10 min-h-[250px] rounded-[22px] border p-6 text-left backdrop-blur-sm transition duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ead7a3] motion-reduce:transform-none sm:p-7 ${selected ? "border-[#d8bd79]/55 bg-[#d8bd79]/[.09] shadow-[0_22px_65px_rgba(0,0,0,.28)]" : "border-white/[.1] bg-white/[.025] hover:-translate-y-1 hover:border-white/28 hover:bg-white/[.05]"}`}
-                key={step.title}
-                onClick={() => setActiveStep(index)}
-                transition={{ duration: reduceMotion ? 0 : 0.55, delay: reduceMotion ? 0 : index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                type="button"
-              >
-                <div className="flex items-start justify-between">
-                  <span className="font-mono text-[11px] tracking-[.16em] text-[#d8bd79]">{step.label}</span>
-                  <span className={`flex h-11 w-11 items-center justify-center rounded-full border transition duration-500 ${selected ? "border-[#d8bd79]/55 bg-[#d8bd79]/[.12] text-[#ead7a3]" : "border-white/12 text-white/55 group-hover:text-[#ead7a3]"}`}><ServiceIcon name={step.icon} /></span>
-                </div>
-                <h3 className="mt-10 text-xl font-semibold tracking-[-.035em] text-white">{step.title}</h3>
-                <p className="mt-4 text-sm leading-6 text-white/60">{step.description}</p>
-              </motion.button>
-            );
-          })}
+        <div className={`relative mt-8 lg:mt-14 ${layout === "path" ? "lg:pb-8" : ""}`}>
+          {layout === "rail" ? <div aria-hidden="true" className="absolute left-0 right-0 top-[18px] hidden h-px bg-white/14 lg:block" /> : null}
+          <ol className={`border-t border-white/12 lg:grid lg:border-t-0 ${listClass} ${layout === "path" ? "lg:gap-3" : ""}`}>
+            {service.process.steps.map((step, index) => {
+              const railClass = "lg:block lg:border-b-0 lg:px-3 lg:py-0 first:lg:pl-0 last:lg:pr-0";
+              const stepsClass = `lg:grid lg:grid-cols-[2.5rem_1fr] lg:gap-4 lg:border-b lg:border-r lg:border-white/10 lg:p-6 ${index === service.process.steps.length - 1 ? "lg:col-span-2" : ""}`;
+              const pathClass = `lg:block lg:border-b-0 lg:border-l lg:border-[#d8bd79]/30 lg:bg-white/[.02] lg:px-5 lg:py-5 ${index % 2 === 1 ? "lg:translate-y-8 motion-reduce:transform-none" : ""}`;
+              const desktopClass = layout === "steps" ? stepsClass : layout === "path" ? pathClass : railClass;
+
+              return (
+                <li className={`relative grid grid-cols-[2.25rem_1fr] gap-3 border-b border-white/10 py-4 ${desktopClass}`} key={step.id}>
+                  <div className={`relative z-10 flex h-9 w-9 items-center justify-center border border-[#d8bd79]/45 bg-[#11110f] text-[#ead7a3] ${layout === "path" ? "rounded-none" : layout === "steps" ? "rounded-lg" : "rounded-full"}`}>
+                    <ServiceIcon className="h-4 w-4" icon={step.icon} />
+                  </div>
+                  <div className={layout === "steps" ? "lg:mt-0" : "lg:mt-6"}>
+                    <div className={`flex items-baseline gap-2 ${layout === "steps" ? "" : "lg:block"}`}>
+                      <p className="font-mono text-[8px] font-semibold uppercase tracking-[.16em] text-[#d8bd79]">{step.label || `0${index + 1}`}</p>
+                      <h3 className={`text-base font-semibold tracking-[-.025em] text-white lg:text-lg ${layout === "steps" ? "" : "lg:mt-2"}`}>{step.title}</h3>
+                    </div>
+                    <p className="mt-1.5 text-xs leading-5 text-white/54 lg:mt-3 lg:text-sm lg:leading-6">{step.description}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </div>
     </section>

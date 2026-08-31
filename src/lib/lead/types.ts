@@ -27,4 +27,14 @@ export type NotificationSms = {
   body: string;
 };
 
-export type DeliveryMode = "sent" | "development";
+export type NotificationChannelResult = {
+  channel: "email" | "sms";
+  provider?: "resend" | "sendgrid" | "twilio";
+  status: "delivered" | "not-configured" | "failed";
+};
+
+export type NotificationDeliveryReport = {
+  delivered: true;
+  email: NotificationChannelResult;
+  sms: NotificationChannelResult;
+};

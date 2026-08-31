@@ -7,10 +7,10 @@ export type ProjectCategory =
 export interface Project {
   id: number;
   title: string;
-  location: string;
+  location?: string;
   category: ProjectCategory;
-  manufacturer: string;
-  warranty: string;
+  manufacturer?: string;
+  warranty?: string;
   description: string;
   featured: boolean;
   image: string;
@@ -19,65 +19,50 @@ export interface Project {
 export const projects: Project[] = [
   {
     id: 1,
-    title: "Luxury Roof Replacement",
-    location: "Green Bay, WI",
+    title: "Residential Roof Preparation",
     category: "Roofing",
-    manufacturer: "Owens Corning",
-    warranty: "Lifetime Workmanship",
     description:
-      "Complete architectural roof replacement featuring premium materials and meticulous installation.",
+      "Active residential roof work showing exposed decking and underlayment preparation.",
     featured: true,
     image: "/images/projects/project-1.jpg",
   },
 
   {
     id: 2,
-    title: "Modern Farmhouse Roof",
-    location: "Appleton, WI",
+    title: "Residential Roof Work in Progress",
     category: "Roofing",
-    manufacturer: "GAF",
-    warranty: "50-Year System",
     description:
-      "Premium dimensional shingles with upgraded ventilation and flashing.",
+      "A real CM Roofing project photographed while removal and installation work remained active.",
     featured: false,
     image: "/images/projects/project-2.jpg",
   },
 
   {
     id: 3,
-    title: "Storm Damage Restoration",
-    location: "Neenah, WI",
-    category: "Storm Damage",
-    manufacturer: "Owens Corning",
-    warranty: "Lifetime Workmanship",
+    title: "Installed Shingle Roof Detail",
+    category: "Roofing",
     description:
-      "Insurance-approved full roof replacement after severe hail damage.",
+      "Installed shingles, ridge caps, and a roof vent shown with active-work context still visible.",
     featured: false,
     image: "/images/projects/project-3.jpg",
   },
 
   {
     id: 4,
-    title: "Premium Siding Installation",
-    location: "De Pere, WI",
-    category: "Siding",
-    manufacturer: "LP SmartSide",
-    warranty: "Manufacturer Warranty",
+    title: "Active Residential Roof Project",
+    category: "Roofing",
     description:
-      "Complete exterior transformation with engineered wood siding.",
+      "An overhead view documenting an active residential roofing project.",
     featured: false,
     image: "/images/projects/project-4.jpg",
   },
 
   {
     id: 5,
-    title: "Commercial Roof Upgrade",
-    location: "Oshkosh, WI",
-    category: "Commercial",
-    manufacturer: "Carlisle",
-    warranty: "20-Year System",
+    title: "Residential New-Construction Roofing",
+    category: "Roofing",
     description:
-      "Commercial roofing system designed for long-term durability and performance.",
+      "A residential new-construction roof photographed during active installation.",
     featured: false,
     image: "/images/projects/project-5.jpg",
   },

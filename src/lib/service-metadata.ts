@@ -1,31 +1,33 @@
 import type { Metadata } from "next";
-import { business } from "@/config/business";
+import { business, getAbsoluteSiteUrl } from "@/config/business";
 import type { ServiceConfig } from "@/config/services";
-import { resolveServiceVisuals } from "./service-images";
 
 /** Creates route metadata without assuming an unverified production domain. */
 export function createServiceMetadata(service: ServiceConfig): Metadata {
   const title = `${service.seo.title} | ${business.name}`;
-  const visuals = resolveServiceVisuals(service);
-  const socialImage = visuals.hero ?? visuals.ambient;
+  const socialImage = service.seo.image ?? service.hero.image;
+  const canonicalUrl = getAbsoluteSiteUrl(service.seo.canonicalPath);
+  const socialImageUrl = socialImage ? getAbsoluteSiteUrl(socialImage.src) : undefined;
 
   return {
     title,
     description: service.seo.description,
-    alternates: { canonical: service.seo.canonicalPath },
+    ...(canonicalUrl ? { alternates: { canonical: canonicalUrl } } : {}),
     openGraph: {
       type: "website",
       title,
       description: service.seo.description,
-      url: service.seo.canonicalPath,
       siteName: business.name,
-      images: socialImage ? [{ url: socialImage.src, alt: socialImage.alt }] : undefined,
+      ...(canonicalUrl ? { url: canonicalUrl } : {}),
+      ...(socialImage && socialImageUrl
+        ? { images: [{ url: socialImageUrl, alt: socialImage.alt }] }
+        : {}),
     },
     twitter: {
-      card: socialImage ? "summary_large_image" : "summary",
+      card: socialImageUrl ? "summary_large_image" : "summary",
       title,
       description: service.seo.description,
-      images: socialImage ? [socialImage.src] : undefined,
+      ...(socialImageUrl ? { images: [socialImageUrl] } : {}),
     },
   };
 }

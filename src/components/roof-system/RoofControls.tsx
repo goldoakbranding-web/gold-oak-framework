@@ -1,32 +1,37 @@
 "use client";
 
 type RoofControlsProps = {
-  isExploded: boolean;
-  onExplodedChange: (value: boolean) => void;
+  mode: "scroll" | "complete" | "exploded";
+  onExplode: () => void;
+  onShowComplete: () => void;
 };
 
-export default function RoofControls({ isExploded, onExplodedChange }: RoofControlsProps) {
+export default function RoofControls({ mode, onExplode, onShowComplete }: RoofControlsProps) {
   return (
-    <div className="inline-flex rounded-full border border-white/10 bg-black/30 p-1 shadow-lg backdrop-blur-md" role="group" aria-label="Roof view controls">
+    <div
+      aria-label="Roof view controls"
+      className="inline-flex max-w-full rounded-full border border-white/10 bg-black/35 p-1 shadow-lg backdrop-blur-md"
+      role="group"
+    >
       <button
-        aria-pressed={!isExploded}
-        className={`rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.13em] transition sm:px-4 ${
-          !isExploded ? "bg-white text-black" : "text-white/55 hover:text-white"
+        aria-pressed={mode === "complete"}
+        className={`inline-flex min-h-11 items-center justify-center rounded-full px-3 text-[9px] font-semibold uppercase tracking-[.1em] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bd79] sm:px-4 sm:text-[10px] sm:tracking-[.13em] motion-reduce:transition-none ${
+          mode === "complete" ? "bg-white text-black" : "text-white/60 hover:text-white"
         }`}
-        onClick={() => onExplodedChange(false)}
+        onClick={onShowComplete}
         type="button"
       >
-        Assembled
+        Show complete roof
       </button>
       <button
-        aria-pressed={isExploded}
-        className={`rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.13em] transition sm:px-4 ${
-          isExploded ? "bg-[#d8bd79] text-[#15130f]" : "text-white/55 hover:text-white"
+        aria-pressed={mode === "exploded"}
+        className={`inline-flex min-h-11 items-center justify-center rounded-full px-3 text-[9px] font-semibold uppercase tracking-[.1em] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bd79] sm:px-4 sm:text-[10px] sm:tracking-[.13em] motion-reduce:transition-none ${
+          mode === "exploded" ? "bg-[#d8bd79] text-[#15130f]" : "text-white/60 hover:text-white"
         }`}
-        onClick={() => onExplodedChange(true)}
+        onClick={onExplode}
         type="button"
       >
-        Exploded
+        Explode roof
       </button>
     </div>
   );

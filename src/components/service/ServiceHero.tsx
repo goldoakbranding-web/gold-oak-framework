@@ -1,49 +1,105 @@
+import Image from "next/image";
 import Link from "next/link";
-import BackgroundImageLayer from "@/components/ui/BackgroundImageLayer";
-import type { ServiceConfig } from "@/config/services";
-import { createServiceImageLayer, type ServiceVisuals } from "@/lib/service-images";
+import type { CSSProperties } from "react";
+import { business } from "@/config/business";
+import type { ServiceConfig, ServiceImage } from "@/config/services";
 
-type ServiceHeroProps = {
-  service: ServiceConfig;
-  visuals: ServiceVisuals;
-};
+type ServiceHeroProps = { service: ServiceConfig };
 
-export default function ServiceHero({ service, visuals }: ServiceHeroProps) {
-  const background = createServiceImageLayer(service, visuals.hero ?? visuals.ambient);
-  const alignment = {
-    start: "items-start text-left",
-    center: "items-center text-center",
-    end: "items-end text-right",
-  }[service.theme.heroAlignment];
+function focalPoint(image: ServiceImage) {
+  return {
+    "--image-position-mobile": image.mobileObjectPosition,
+    "--image-position-desktop": image.objectPosition,
+  } as CSSProperties;
+}
+
+function HeroCopy({ service, immersive = false }: { service: ServiceConfig; immersive?: boolean }) {
+  return (
+    <div className={immersive ? "max-w-4xl" : "max-w-2xl"}>
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-[9px] font-bold uppercase tracking-[.18em] text-white/58 sm:text-[10px]">
+        <Link className="transition hover:text-[#ead7a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ead7a3]" href="/">Home</Link>
+        <span aria-hidden="true" className="text-[#d8bd79]">/</span>
+        <Link className="transition hover:text-[#ead7a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ead7a3]" href="/#services">Services</Link>
+        <span aria-hidden="true" className="text-[#d8bd79]">/</span>
+        <span aria-current="page" className="text-white/82">{service.name}</span>
+      </nav>
+
+      <p className="mt-5 text-[10px] font-bold uppercase tracking-[.3em] text-[#ead7a3] sm:mt-6 sm:text-xs">{service.hero.eyebrow}</p>
+      <h1 className={`mt-3 text-balance leading-[.88] tracking-[-.02em] text-white [font-family:var(--font-bebas)] sm:mt-4 ${immersive ? "text-[3.25rem] sm:text-7xl lg:text-8xl" : "text-[2.75rem] sm:text-6xl lg:text-7xl"}`}>
+        {service.hero.title}
+      </h1>
+      <p className="mt-4 max-w-2xl text-pretty text-[15px] leading-7 text-white/72 sm:mt-5 sm:text-lg sm:leading-8">{service.hero.description}</p>
+
+      <div className="mt-5 grid gap-3 sm:mt-7 sm:flex sm:flex-wrap">
+        <Link className="inline-flex min-h-13 items-center justify-center bg-[#d8bd79] px-6 text-[10px] font-bold uppercase tracking-[.16em] text-[#17130a] transition hover:bg-[#ead7a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ead7a3] sm:min-h-14 sm:px-8" href="#service-estimate">
+          Request a Free Estimate
+        </Link>
+        {business.phone.href ? (
+          <a className="inline-flex min-h-13 items-center justify-center border border-white/30 bg-black/25 px-6 text-[10px] font-bold uppercase tracking-[.16em] text-white backdrop-blur-sm transition hover:border-white/65 hover:bg-black/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:min-h-14 sm:px-8" href={business.phone.href}>
+            Call {business.phone.value}
+          </a>
+        ) : null}
+      </div>
+
+      {service.hero.indicators.length > 0 ? (
+        <ul className={`${service.slug === "roofing" ? "hidden md:grid" : "grid"} mt-5 grid-cols-3 border-y border-white/16 sm:mt-9 sm:max-w-3xl`}>
+          {service.hero.indicators.map((indicator, index) => (
+            <li className="border-r border-white/16 px-2 py-3 text-[9px] font-bold uppercase leading-4 tracking-[.1em] text-white/68 first:pl-0 last:border-r-0 sm:px-4 sm:tracking-[.12em]" key={indicator}>
+              <span className="mr-1.5 text-[#d8bd79]">0{index + 1}</span>{indicator}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+export default function ServiceHero({ service }: ServiceHeroProps) {
+  const image = service.hero.image;
+
+  if (service.theme.heroLayout === "immersive") {
+    return (
+      <section className="relative isolate flex min-h-[680px] items-end overflow-hidden bg-[#090908] pb-10 pt-28 sm:min-h-[760px] sm:pb-16 sm:pt-32 lg:min-h-[820px] lg:pb-20" id="service-top" style={focalPoint(image)}>
+        <Image
+          alt={image.alt}
+          className="object-cover [object-position:var(--image-position-mobile)] lg:[object-position:var(--image-position-desktop)]"
+          fill
+          preload
+          sizes="100vw"
+          src={image.src}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,4,.25)_0%,rgba(5,5,4,.38)_28%,rgba(5,5,4,.92)_100%)] lg:bg-[linear-gradient(90deg,rgba(5,5,4,.92)_0%,rgba(5,5,4,.7)_46%,rgba(5,5,4,.2)_82%)]" />
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8">
+          <HeroCopy immersive service={service} />
+        </div>
+      </section>
+    );
+  }
+
+  const imageFirst = service.theme.heroLayout === "editorial-right";
+  const contentAlignment = service.theme.heroAlignment === "end" ? "lg:ml-auto" : service.theme.heroAlignment === "center" ? "lg:mx-auto lg:text-center" : "";
 
   return (
-    <section className="relative isolate flex min-h-[760px] items-end overflow-hidden bg-[#080807] pb-16 pt-36 sm:min-h-[820px] sm:pb-20 sm:pt-40 lg:min-h-[900px] lg:pb-28" id="service-top">
-      {background.image ? <BackgroundImageLayer background={background} preload /> : <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_16%,rgba(216,189,121,.16),transparent_35%),linear-gradient(135deg,#080807_0%,#17140d_52%,#080807_100%)]" />}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] [background-size:96px_96px] opacity-35 [mask-image:linear-gradient(to_bottom,transparent,black_36%,transparent_85%)]" />
-      <div className="pointer-events-none absolute -right-40 top-20 h-[620px] w-[620px] rounded-full bg-[#d8bd79]/[.11] blur-[170px]" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-b from-transparent via-[#080807]/60 to-[#080807]" />
-      <div className="pointer-events-none absolute inset-x-[10%] bottom-0 h-px bg-gradient-to-r from-transparent via-[#ead7a3]/45 to-transparent" />
-
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8">
-        <div className={`flex max-w-4xl flex-col ${alignment}`}>
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.18em] text-white/52">
-            <Link className="transition hover:text-[#ead7a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ead7a3]" href="/">Home</Link>
-            <span aria-hidden="true" className="text-[#d8bd79]">/</span>
-            <Link className="transition hover:text-[#ead7a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ead7a3]" href="/#services">Services</Link>
-            <span aria-hidden="true" className="text-[#d8bd79]">/</span>
-            <span aria-current="page" className="text-white/78">{service.name}</span>
-          </nav>
-          <p className="mt-8 text-[10px] font-semibold uppercase tracking-[.5em] text-[#ead7a3] sm:text-xs sm:tracking-[.62em]">{service.eyebrow}</p>
-          <h1 className="mt-5 max-w-4xl text-balance text-5xl font-semibold leading-[.95] tracking-[-.065em] text-white sm:mt-7 sm:text-6xl md:text-7xl lg:text-8xl">{service.heroTitle}</h1>
-          <p className="mt-7 max-w-2xl text-pretty text-base leading-7 text-white/74 sm:text-lg sm:leading-8">{service.heroDescription}</p>
-          <div className="mt-10 flex w-full flex-col gap-3 sm:mt-12 sm:w-auto sm:flex-row">
-            <Link className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#d8bd79] px-7 text-[11px] font-bold uppercase tracking-[.16em] text-[#17130a] shadow-[0_14px_36px_rgba(216,189,121,.18)] transition hover:-translate-y-0.5 hover:bg-[#ead7a3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ead7a3] motion-reduce:transform-none" href="/#contact">Request an Estimate</Link>
-            <a className="inline-flex min-h-14 items-center justify-center rounded-full border border-white/22 bg-black/20 px-7 text-[11px] font-bold uppercase tracking-[.16em] text-white backdrop-blur-md transition hover:-translate-y-0.5 hover:border-white/48 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white motion-reduce:transform-none" href="#service-process">Explore the Process</a>
+    <section className="overflow-hidden bg-[#090908] pt-20 sm:pt-28 lg:pt-0" id="service-top">
+      <div className="mx-auto grid max-w-[1600px] lg:min-h-[760px] lg:grid-cols-2">
+        <div className={`relative order-2 min-h-[200px] bg-[#171714] sm:min-h-[340px] lg:min-h-full ${imageFirst ? "lg:order-1" : "lg:order-2"}`} style={focalPoint(image)}>
+          <div className={`absolute ${image.presentation === "detail" ? "inset-0 lg:inset-x-12 lg:inset-y-20 lg:ring-1 lg:ring-white/10 xl:inset-x-24 xl:inset-y-28" : "inset-0"}`}>
+            <Image
+              alt={image.alt}
+              className="object-cover [object-position:var(--image-position-mobile)] lg:[object-position:var(--image-position-desktop)]"
+              fill
+              preload
+              sizes={image.presentation === "detail" ? "(max-width: 1023px) 100vw, 38vw" : "(max-width: 1023px) 100vw, 50vw"}
+              src={image.src}
+            />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10 lg:bg-gradient-to-r lg:from-black/15 lg:to-transparent" />
+          {image.caption ? <p className="absolute bottom-3 left-3 right-3 max-w-xl border-l border-[#d8bd79] bg-black/65 px-3 py-2 text-[8px] font-semibold leading-4 tracking-[.08em] text-white/78 backdrop-blur-sm sm:bottom-5 sm:left-5 sm:right-auto sm:text-[9px]">{image.caption}</p> : null}
         </div>
-
-        <div className="mt-14 grid max-w-3xl grid-cols-1 divide-y divide-white/10 rounded-[22px] border border-white/10 bg-black/20 backdrop-blur-md sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:rounded-full">
-          {service.heroIndicators.map((indicator, index) => <div className="flex items-center gap-3 px-5 py-4 text-[10px] font-semibold uppercase tracking-[.16em] text-white/70" key={indicator}><span className="font-mono text-[#d8bd79]">0{index + 1}</span>{indicator}</div>)}
+        <div className={`order-1 flex items-center px-5 pb-8 pt-6 sm:px-8 sm:pb-14 sm:pt-10 lg:px-14 lg:py-32 xl:px-20 ${imageFirst ? "lg:order-2" : "lg:order-1"}`}>
+          <div className={`w-full ${contentAlignment}`}>
+            <HeroCopy service={service} />
+          </div>
         </div>
       </div>
     </section>

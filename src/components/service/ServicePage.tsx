@@ -1,37 +1,43 @@
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/sections/Footer";
 import type { ServiceConfig } from "@/config/services";
-import { resolveServiceVisuals } from "@/lib/service-images";
-import BeforeAfterShowcase from "./BeforeAfterShowcase";
-import BenefitsGrid from "./BenefitsGrid";
+import type { ReactNode } from "react";
 import RelatedServices from "./RelatedServices";
-import ServiceCTA from "./ServiceCTA";
+import ServiceEstimate from "./ServiceEstimate";
 import ServiceFAQ from "./ServiceFAQ";
 import ServiceGallery from "./ServiceGallery";
 import ServiceHero from "./ServiceHero";
 import ServiceIntro from "./ServiceIntro";
 import ServiceJsonLd from "./ServiceJsonLd";
+import ServiceOptions from "./ServiceOptions";
 import ServiceProcess from "./ServiceProcess";
+import ServiceProjectStory from "./ServiceProjectStory";
+import ServiceTrust from "./ServiceTrust";
 
-type ServicePageProps = { service: ServiceConfig };
+type ServicePageProps = {
+  service: ServiceConfig;
+  afterOptions?: ReactNode;
+};
 
-export default function ServicePage({ service }: ServicePageProps) {
-  const visuals = resolveServiceVisuals(service);
-
+export default function ServicePage({ service, afterOptions }: ServicePageProps) {
   return (
     <>
-      <Navbar />
-      <main>
-        <ServiceJsonLd service={service} />
-        <ServiceHero service={service} visuals={visuals} />
-        <ServiceIntro service={service} visuals={visuals} />
-        <BenefitsGrid service={service} />
+      <Navbar estimateHref="#service-estimate" />
+      <ServiceJsonLd service={service} />
+      <main className="overflow-clip bg-[#0a0a09] [font-family:var(--font-inter)]">
+        <ServiceHero service={service} />
+        <ServiceIntro service={service} />
+        <ServiceOptions service={service} />
+        {afterOptions}
+        <ServiceProjectStory service={service} />
+        <ServiceTrust service={service} />
         <ServiceProcess service={service} />
-        <BeforeAfterShowcase service={service} visuals={visuals} />
-        <ServiceGallery service={service} visuals={visuals} />
+        <ServiceGallery service={service} />
         <ServiceFAQ service={service} />
-        <ServiceCTA service={service} visuals={visuals} />
         <RelatedServices service={service} />
+        <ServiceEstimate service={service} />
       </main>
+      <Footer />
     </>
   );
 }

@@ -1,6 +1,11 @@
+import { business } from "./business";
+
 export const serviceOptions = [
+  "Roofing",
   "Roof Replacement",
   "Roof Repair",
+  "Commercial Roofing",
+  "New Construction Roofing",
   "Storm Damage",
   "Siding",
   "Gutters",
@@ -29,7 +34,7 @@ export type EstimateFormValues = {
 
 export type EstimateFormField = Exclude<keyof EstimateFormValues, "website" | "formStartedAt">;
 export type EstimateFormErrors = Partial<Record<EstimateFormField, string>>;
-export type EstimateSubmissionState = "idle" | "submitting" | "success" | "development" | "error";
+export type EstimateSubmissionState = "idle" | "submitting" | "success" | "error";
 
 export type ContactImage = {
   src: string;
@@ -50,11 +55,14 @@ export type ContactConfig = {
   formDescription: string;
   submitLabel: string;
   successNotice: string;
-  developmentNotice: string;
+  failureNotice: string;
   privacyNotice: string;
   image?: ContactImage;
   trustItems: ContactTrustItem[];
 };
+
+export const estimateFailureNotice =
+  "We couldn't send your request right now. Please try again, call (920) 789-0700, or email cmroofing28@gmail.com.";
 
 export const contactConfig: ContactConfig = {
   eyebrow: "Start your project",
@@ -64,9 +72,8 @@ export const contactConfig: ContactConfig = {
   formTitle: "Project details",
   formDescription: "Complete the fields below to prepare an estimate request.",
   submitLabel: "Request My Free Estimate",
-  successNotice: "Thank you — your estimate request has been sent. Our team will be in touch soon.",
-  developmentNotice:
-    "Your request was validated. Notification credentials are not configured in this environment, so the formatted email and text payloads were logged server-side instead of delivered.",
+  successNotice: "Our team will follow up using your preferred contact method.",
+  failureNotice: estimateFailureNotice,
   privacyNotice: "Your details are used only to respond to this estimate request. No payment information is requested.",
   image: {
     src: "/images/projects/project-4.jpg",
@@ -79,4 +86,3 @@ export const contactConfig: ContactConfig = {
     { id: "no-financial-data", label: "No payment details requested" },
   ],
 };
-import { business } from "./business";

@@ -56,12 +56,14 @@ export function validateEstimateLead(input: unknown): LeadValidationResult {
   };
   const errors: Record<string, string> = {};
   const phoneDigits = data.phone.replace(/\D/g, "");
+  const phoneRequired = data.preferredContact === "Phone" || data.preferredContact === "Text";
+  const emailRequired = data.preferredContact === "Email";
 
   if (!data.fullName) errors.fullName = "Enter your full name.";
-  if (!data.phone) errors.phone = "Enter a phone number.";
-  else if (phoneDigits.length < 10 || phoneDigits.length > 15) errors.phone = "Enter a valid phone number.";
-  if (!data.email) errors.email = "Enter your email address.";
-  else if (!emailPattern.test(data.email)) errors.email = "Enter a valid email address.";
+  if (phoneRequired && !data.phone) errors.phone = "Enter a phone number.";
+  else if (data.phone && (phoneDigits.length < 10 || phoneDigits.length > 15)) errors.phone = "Enter a valid phone number.";
+  if (emailRequired && !data.email) errors.email = "Enter your email address.";
+  else if (data.email && !emailPattern.test(data.email)) errors.email = "Enter a valid email address.";
   if (!data.propertyLocation) errors.propertyLocation = "Enter your property address or city.";
   if (!hasOption(serviceOptions, data.serviceNeeded)) errors.serviceNeeded = "Choose a valid service.";
   if (!hasOption(preferredContactOptions, data.preferredContact)) errors.preferredContact = "Choose a valid contact method.";
@@ -71,6 +73,13 @@ export function validateEstimateLead(input: unknown): LeadValidationResult {
 }
 
 export function getEstimateLead(input: EstimateLeadInput): EstimateLead {
-  const { consent: _consent, website: _website, formStartedAt: _formStartedAt, ...lead } = input;
-  return lead;
+  return {
+    fullName: input.fullName,
+    phone: input.phone,
+    email: input.email,
+    propertyLocation: input.propertyLocation,
+    serviceNeeded: input.serviceNeeded,
+    preferredContact: input.preferredContact,
+    projectDetails: input.projectDetails,
+  };
 }

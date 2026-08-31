@@ -34,10 +34,10 @@ export const finalCtaConfig: FinalCtaConfig = {
     unavailableLabel: "Call option pending verified phone number",
   },
   trustItems: [
-    { id: "free-estimates", label: "Free Estimates", isVerified: false },
-    { id: "licensed-insured", label: "Licensed & Insured", isVerified: false },
-    { id: "quality-materials", label: "Quality Materials", isVerified: false },
+    { id: "free-estimates", label: "Free Estimates", isVerified: true },
+    { id: "licensed-insured", label: "Fully Licensed & Insured", isVerified: true },
+    { id: "workmanship-warranty", label: "5-Year Workmanship Warranty", isVerified: true },
   ],
-  verificationNote: "Trust information is configurable and should be verified before launch.",
+  verificationNote: "Manufacturer warranty terms vary by selected product and manufacturer requirements.",
 };
 import { business } from "./business";

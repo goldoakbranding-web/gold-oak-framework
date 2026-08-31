@@ -2,12 +2,13 @@ import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/sections/Hero";
 import TrustBar from "@/components/sections/TrustBar";
 import Services from "@/components/sections/Services";
-import RoofSystem from "@/components/sections/RoofSystem";
-import WhyChoose from "@/components/sections/WhyChoose";
-import Testimonials from "@/components/sections/Testimonials";
+import ServiceArea from "@/components/sections/ServiceArea";
 import Process from "@/components/sections/Process";
-import FinalCTA from "@/components/sections/FinalCTA";
+import RoofSystem from "@/components/sections/RoofSystem";
+import RecentProjects from "@/components/sections/RecentProjects";
+import FacebookUpdates from "@/components/sections/FacebookUpdates";
 import Contact from "@/components/sections/Contact";
+import Footer from "@/components/sections/Footer";
 
 export default function Home() {
   return (
@@ -20,17 +21,19 @@ export default function Home() {
 
       <Services />
 
-      <RoofSystem />
-
-      <WhyChoose />
-
-      <Testimonials />
+      <ServiceArea />
 
       <Process />
 
-      <FinalCTA />
+      <RoofSystem />
+
+      <RecentProjects />
+
+      <FacebookUpdates />
 
       <Contact />
+
+      <Footer />
     </>
   );
 }

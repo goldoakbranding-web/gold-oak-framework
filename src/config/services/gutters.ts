@@ -1,28 +1,104 @@
-import { serviceImageDirectories, type ServiceConfig } from "./types";
+import type { ServiceConfig, ServiceImage } from "./types";
+
+const gutterImage: ServiceImage = {
+  src: "/images/services/gutters.jpg",
+  alt: "Dark gutter and downspout following a white residential roofline",
+  objectPosition: "50% 50%",
+  mobileObjectPosition: "56% 50%",
+  presentation: "detail",
+};
 
 export const guttersService: ServiceConfig = {
-  slug: "gutters", name: "Gutters", eyebrow: "Water management", heroTitle: "Water, Given a Clearer Path.", heroDescription: "Gutters are a precise edge system—quietly directing water where it needs to go while keeping the roofline composed.", heroIndicators: ["Roofline review", "Drainage planning", "Clean transitions"],
-  theme: { id: "precision", heroAlignment: "start", introLayout: "image-right", benefitsLayout: "balanced", processLayout: "path", galleryLayout: "frames", accent: "#d8bd79" }, imageDirectories: serviceImageDirectories("gutters"),
-  intro: { eyebrow: "The roofline in motion", title: "A simple system with an exacting role.", description: "Gutter planning is about more than the visible channel. Roof edges, downspout routes, transitions, and drainage direction all deserve a deliberate look.", supporting: "The goal is a clean, coordinated path that works with the property rather than against it." },
-  benefits: { eyebrow: "Precision at the edge", title: "The details direct the flow.", description: "A careful look at rooflines and paths helps shape a more informed gutter plan.", items: [
-    { id: "roofline", icon: "detail", title: "Roofline coordination", description: "Review the gutter direction with the fascia, roof edges, and surrounding exterior details.", detail: "The visible line should feel intentional." },
-    { id: "routing", icon: "water", title: "Thoughtful routing", description: "Consider where water will travel after it leaves each roof area.", detail: "A clearer path from edge to ground." },
-    { id: "scale", icon: "measure", title: "Proportional detail", description: "Evaluate profiles, downspout placement, and transitions in the context of the elevation.", detail: "Utility and appearance in the same view." },
-    { id: "finish", icon: "finish", title: "Clean finishing", description: "Use the final details to keep the roofline composed and visually quiet.", detail: "A more resolved exterior edge." },
-  ] },
-  process: { eyebrow: "Follow the water", title: "A practical route from roof edge to drainage plan.", description: "The sequence stays focused on direction, connection, and the details that make the system feel integrated.", steps: [
-    { id: "map", label: "01", icon: "measure", title: "Map the roofline", description: "Identify the roof edges, changes in direction, and exterior conditions that shape the plan." },
-    { id: "route", label: "02", icon: "water", title: "Review the route", description: "Discuss downspout direction and the practical path for each collection area." },
-    { id: "coordinate", label: "03", icon: "detail", title: "Coordinate details", description: "Align the visible components with fascia, siding, and other roofline elements." },
-    { id: "finish", label: "04", icon: "finish", title: "Confirm the finish", description: "Review the completed lines, transitions, and overall composition." },
-  ] },
-  beforeAfter: { eyebrow: "Roofline refinement", title: "A cleaner line with a clearer purpose.", description: "Add approved comparison images to show the difference in roofline composition and water routing.", beforeLabel: "Existing edge", afterLabel: "Finished route" },
-  gallery: { eyebrow: "Gutter details", title: "Project photography for edges, corners, and finished lines.", description: "This gallery is ready for wide elevations and close-up transition photography." },
-  faq: { eyebrow: "Gutter questions", title: "The edge details are worth discussing.", description: "A review of the roofline and property conditions helps make the plan more specific.", items: [
-    { id: "placement", question: "What affects downspout placement?", answer: "Roof geometry, collection areas, the exterior elevation, and the desired drainage path are useful factors to review together." },
-    { id: "coordination", question: "Can gutters be planned alongside other exterior work?", answer: "Yes. Coordinating the roofline elements can make the final exterior feel more intentional and reduce disconnected decisions." },
-    { id: "scope", question: "What should a gutter conversation include?", answer: "A helpful scope considers roof edges, direction changes, downspout routes, visible finish details, and the conditions around the property." },
-  ] },
-  cta: { eyebrow: "Clarify the route", title: "Start with the roofline and the paths that matter.", description: "Tell us about the exterior conditions or drainage questions you would like to discuss." }, relatedServices: ["roofing", "soffit-fascia", "siding"],
-  seo: { title: "Gutter Services", description: "Explore CM Roofing's gutter planning and roofline coordination approach.", canonicalPath: "/services/gutters" },
+  slug: "gutters",
+  name: "Gutters",
+  theme: {
+    id: "precision",
+    heroLayout: "editorial-left",
+    heroAlignment: "start",
+    introLayout: "text-only",
+    optionsLayout: "list",
+    processLayout: "path",
+    galleryLayout: "frames",
+    accent: "#d8bd79",
+  },
+  hero: {
+    eyebrow: "Seamless gutters & downspouts",
+    title: "Control Rainwater From the Roofline to the Ground.",
+    description:
+      "CM Roofing installs seamless gutters, downspouts, and gutter protection for homes and businesses throughout Central Wisconsin.",
+    indicators: ["Roofline review", "Downspout planning", "Exterior coordination"],
+    image: gutterImage,
+  },
+  intro: {
+    eyebrow: "Water management at the edge",
+    title: "Follow the path from roof plane to ground.",
+    description:
+      "Changes in roof direction and elevation affect where water arrives at the eave. Reviewing those collection areas and the available downspout routes creates a more useful plan for the property.",
+    supporting:
+      "A useful layout makes the collection points and downspout routes understandable before installation begins.",
+  },
+  options: {
+    eyebrow: "Gutter services",
+    title: "A complete scope for the roofline and drainage path.",
+    description: "The project can address seamless installation, replacement, downspouts, or protection along the gutter system.",
+    items: [
+      { id: "installation", title: "Seamless Gutter Installation", description: "Plan continuous gutter runs, outlets, corners, and downspouts around the property's roofline." },
+      { id: "replacement", title: "Gutter Replacement", description: "Review the existing runs, corners, outlets, downspouts, and adjacent fascia before defining the replacement scope." },
+      { id: "downspouts", title: "Downspouts", description: "Coordinate collection points, visible routes, and where water travels after it leaves the roofline." },
+      { id: "protection", title: "Gutter Protection Solutions", description: "Discuss protection options in the context of the gutter layout, roof edge, and maintenance goals." },
+    ],
+  },
+  trust: {
+    eyebrow: "Why choose CM Roofing",
+    title: "Keep water direction and exterior details in the same plan.",
+    description: "The gutter scope starts with the roof geometry and remains connected to the surrounding roofline.",
+    items: [
+      { id: "roofline", title: "Roofline-first review", description: "Map the eaves, corners, changes in direction, and collection areas before laying out runs." },
+      { id: "routing", title: "Visible routing plan", description: "Discuss downspout locations and the practical path for water at each area." },
+      { id: "coordination", title: "Exterior coordination", description: "Consider gutters alongside fascia, roof edges, siding, and nearby transitions." },
+      { id: "review", title: "Final system review", description: "Review the installed lines, outlets, downspouts, and details included in the scope." },
+    ],
+  },
+  process: {
+    eyebrow: "The gutter process",
+    title: "Five steps along the water path.",
+    description: "A compact sequence keeps roof geometry, routing, installation, and final review connected.",
+    steps: [
+      { id: "map", label: "01", icon: "measure", title: "Map", description: "Review the roof edges, collection areas, corners, and exterior conditions." },
+      { id: "route", label: "02", icon: "water", title: "Route", description: "Plan the gutter runs, outlets, downspouts, and practical water direction." },
+      { id: "scope", label: "03", icon: "guide", title: "Define", description: "Confirm the components, work areas, adjacent details, and preparation in the scope." },
+      { id: "install", label: "04", icon: "detail", title: "Install", description: "Complete the agreed gutter and downspout work along the planned roofline." },
+      { id: "review", label: "05", icon: "finish", title: "Review", description: "Check the completed runs, transitions, outlets, and visible routing details." },
+    ],
+  },
+  faq: {
+    eyebrow: "Gutter questions",
+    title: "Start at the roof edge, then follow the route.",
+    description: "The answers depend on the roof geometry and the conditions around the property.",
+    items: [
+      { id: "placement", question: "What affects downspout placement?", answer: "Roof geometry, collection areas, corners, exterior openings, visible elevations, and the available path at ground level can all affect the layout." },
+      { id: "replace", question: "When should gutter replacement be considered?", answer: "A review can look at the existing runs, connections, outlets, downspouts, alignment, and nearby fascia to define what needs attention." },
+      { id: "coordinate", question: "Can gutters be planned with roofing or fascia work?", answer: "Yes. Coordinating work at the roof edge can make transitions, scheduling, and the finished roofline easier to address together." },
+      { id: "scope", question: "What should the estimate identify?", answer: "The planned runs, outlets, downspouts, work areas, relevant roofline conditions, and any coordinated exterior details should be clear in the project conversation." },
+    ],
+  },
+  estimate: {
+    eyebrow: "Map the roofline",
+    title: "Request a gutter estimate.",
+    description: "Tell us where you are seeing a concern or which rooflines need a new gutter plan.",
+    defaultService: "Gutters",
+  },
+  cta: {
+    eyebrow: "Follow the water",
+    title: "Build a clearer route from roof edge to ground.",
+    description: "Start with the rooflines, downspouts, or drainage questions you want to review.",
+    image: gutterImage,
+  },
+  relatedServices: ["roofing", "soffit-fascia", "siding"],
+  seo: {
+    title: "Seamless Gutter Installation & Replacement",
+    description: "Explore seamless gutter installation, gutter replacement, downspouts, and gutter protection solutions throughout Central Wisconsin.",
+    canonicalPath: "/services/gutters",
+    image: gutterImage,
+  },
 };

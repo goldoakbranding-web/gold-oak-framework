@@ -1,4 +1,4 @@
-import { business } from "@/config/business";
+import { business, getAbsoluteSiteUrl } from "@/config/business";
 import type { ServiceConfig } from "@/config/services";
 
 type ServiceJsonLdProps = {
@@ -11,21 +11,36 @@ function toJsonLd(value: unknown) {
 
 /** Schema is intentionally limited to configured service content and avoids unverified business facts. */
 export default function ServiceJsonLd({ service }: ServiceJsonLdProps) {
+  const homeUrl = getAbsoluteSiteUrl("/");
+  const serviceUrl = getAbsoluteSiteUrl(service.seo.canonicalPath);
+  const businessId = getAbsoluteSiteUrl("/#business");
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-      { "@type": "ListItem", position: 2, name: service.name, item: service.seo.canonicalPath },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        ...(homeUrl ? { item: homeUrl } : {}),
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: service.name,
+        ...(serviceUrl ? { item: serviceUrl } : {}),
+      },
     ],
   };
   const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
+    ...(serviceUrl ? { "@id": `${serviceUrl}#service`, url: serviceUrl } : {}),
     name: service.name,
     description: service.seo.description,
     provider: {
       "@type": "Organization",
+      ...(businessId ? { "@id": businessId } : {}),
       name: business.name,
       telephone: business.phone.value,
       email: business.email.value,
@@ -45,7 +60,9 @@ export default function ServiceJsonLd({ service }: ServiceJsonLdProps) {
     <>
       <script dangerouslySetInnerHTML={{ __html: toJsonLd(breadcrumbSchema) }} type="application/ld+json" />
       <script dangerouslySetInnerHTML={{ __html: toJsonLd(serviceSchema) }} type="application/ld+json" />
-      <script dangerouslySetInnerHTML={{ __html: toJsonLd(faqSchema) }} type="application/ld+json" />
+      {service.faq.items.length ? (
+        <script dangerouslySetInnerHTML={{ __html: toJsonLd(faqSchema) }} type="application/ld+json" />
+      ) : null}
     </>
   );
 }
