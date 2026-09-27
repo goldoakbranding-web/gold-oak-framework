@@ -81,5 +81,6 @@ export function getEstimateLead(input: EstimateLeadInput): EstimateLead {
     serviceNeeded: input.serviceNeeded,
     preferredContact: input.preferredContact,
     projectDetails: input.projectDetails,
+    consent: input.consent,
   };
 }

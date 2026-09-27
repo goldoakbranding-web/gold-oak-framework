@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Buffer } from "node:buffer";
+import { Resend } from "resend";
 import { business } from "@/config/business";
 import type {
   EstimateLead,
@@ -10,11 +11,12 @@ import type {
   NotificationSms,
 } from "./types";
 
-type EmailProvider = "resend" | "sendgrid";
 type SmsProvider = "twilio";
 type DeliveryFailureReason = "not-configured" | "delivery-failed";
 
 const requestTimeoutMs = 10_000;
+const leadSource = "cmroofingwi.com";
+const resendSender = "CM Roofing Website <leads@cmroofingwi.com>";
 
 /** Contains only operational channel state; lead content and credentials are never attached. */
 export class LeadDeliveryError extends Error {
@@ -55,43 +57,88 @@ function displayValue(value: string) {
   return value || "Not provided";
 }
 
-function toPlainText(lead: EstimateLead) {
+function formatSubmissionTimestamp(submittedAt: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "long",
+    timeZone: "America/Chicago",
+  }).format(submittedAt);
+}
+
+function getEmailSubject(lead: EstimateLead) {
+  const service = lead.serviceNeeded ? ` — ${lead.serviceNeeded}` : "";
+  return `New CM Roofing Website Lead — ${lead.fullName}${service}`;
+}
+
+function toPlainText(lead: EstimateLead, submittedAt: Date) {
   return [
     `New website lead for ${business.name}`,
     "",
     `Name: ${lead.fullName}`,
     `Phone: ${displayValue(lead.phone)}`,
     `Email: ${displayValue(lead.email)}`,
-    `Location: ${lead.propertyLocation}`,
+    `Property location: ${lead.propertyLocation}`,
     `Service: ${lead.serviceNeeded}`,
-    `Preferred contact: ${lead.preferredContact}`,
+    `Preferred contact method: ${lead.preferredContact}`,
     `Project details: ${displayValue(lead.projectDetails)}`,
+    `Consent: ${lead.consent ? "Yes" : "No"}`,
+    `Source: ${leadSource}`,
+    `Submitted: ${formatSubmissionTimestamp(submittedAt)} (${submittedAt.toISOString()})`,
   ].join("\n");
 }
 
-function createEmailHtml(lead: EstimateLead) {
+function createEmailHtml(lead: EstimateLead, submittedAt: Date) {
   const rows = [
-    ["Name", lead.fullName],
-    ["Phone", displayValue(lead.phone)],
-    ["Email", displayValue(lead.email)],
-    ["Property address or city", lead.propertyLocation],
-    ["Service needed", lead.serviceNeeded],
-    ["Preferred contact", lead.preferredContact],
-    ["Project details", displayValue(lead.projectDetails)],
+    { label: "Name", value: lead.fullName },
+    {
+      label: "Phone",
+      value: displayValue(lead.phone),
+      href: lead.phone ? `tel:${lead.phone.replace(/[^\d+]/g, "")}` : undefined,
+    },
+    {
+      label: "Email",
+      value: displayValue(lead.email),
+      href: lead.email ? `mailto:${lead.email}` : undefined,
+    },
+    { label: "Property location", value: lead.propertyLocation },
+    { label: "Service", value: lead.serviceNeeded },
+    { label: "Preferred contact method", value: lead.preferredContact },
+    { label: "Project details", value: displayValue(lead.projectDetails) },
+    { label: "Consent", value: lead.consent ? "Yes" : "No" },
+    { label: "Source", value: leadSource },
+    {
+      label: "Submitted",
+      value: `${formatSubmissionTimestamp(submittedAt)} (${submittedAt.toISOString()})`,
+    },
   ];
 
-  return `<!doctype html><html><body style="margin:0;background:#f3f1eb;color:#171712;font-family:Arial,sans-serif"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:32px 16px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e2ded1;border-radius:16px;overflow:hidden"><tr><td style="padding:28px 32px;background:#11110f;color:#fff"><p style="margin:0 0 10px;color:#c8a24d;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase">New website lead</p><h1 style="margin:0;font-size:28px;line-height:1.2">${escapeHtml(business.name)}</h1></td></tr><tr><td style="padding:12px 32px 28px">${rows.map(([label, value]) => `<div style="padding:16px 0;border-bottom:1px solid #ece8dd"><div style="color:#7c745f;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase">${escapeHtml(label)}</div><div style="margin-top:6px;color:#171712;font-size:16px;line-height:1.5;white-space:pre-line">${escapeHtml(value)}</div></div>`).join("")}</td></tr></table></td></tr></table></body></html>`;
+  const rowMarkup = rows.map(({ href, label, value }) => {
+    const content = href
+      ? `<a href="${escapeHtml(href)}" style="color:#8a6a20;text-decoration:underline">${escapeHtml(value)}</a>`
+      : escapeHtml(value);
+    return `<div style="padding:16px 0;border-bottom:1px solid #ece8dd"><div style="color:#7c745f;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase">${escapeHtml(label)}</div><div style="margin-top:6px;color:#171712;font-size:16px;line-height:1.5;white-space:pre-line">${content}</div></div>`;
+  }).join("");
+
+  const replyNote = lead.email
+    ? `<p style="margin:24px 0 0;color:#625d50;font-size:13px;line-height:1.6">Reply to this email to respond directly to ${escapeHtml(lead.fullName)}.</p>`
+    : "";
+
+  return `<!doctype html><html><body style="margin:0;background:#f3f1eb;color:#171712;font-family:Arial,sans-serif"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:32px 16px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e2ded1;border-radius:16px;overflow:hidden"><tr><td style="padding:28px 32px;background:#11110f;color:#fff"><p style="margin:0 0 10px;color:#c8a24d;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase">New website lead</p><h1 style="margin:0;font-size:28px;line-height:1.2">${escapeHtml(business.name)}</h1></td></tr><tr><td style="padding:12px 32px 28px">${rowMarkup}${replyNote}</td></tr></table></td></tr></table></body></html>`;
 }
 
-export function createNotificationPayloads(lead: EstimateLead): { email: NotificationEmail; sms: NotificationSms } {
-  const text = toPlainText(lead);
+export function createNotificationPayloads(
+  lead: EstimateLead,
+  submittedAt = new Date(),
+): { email: NotificationEmail; sms: NotificationSms } {
+  const text = toPlainText(lead, submittedAt);
   return {
     email: {
-      to: getEnvironmentValue("LEAD_RECIPIENT_EMAIL", "EMAIL_TO") ?? business.notificationRecipients.email,
-      from: getEnvironmentValue("LEAD_FROM_EMAIL", "RESEND_FROM_EMAIL", "SENDGRID_FROM_EMAIL", "EMAIL_FROM"),
-      subject: `New website lead: ${lead.serviceNeeded} — ${lead.fullName}`,
+      to: getEnvironmentValue("CONTACT_NOTIFICATION_EMAIL") ?? "",
+      from: resendSender,
+      replyTo: lead.email || undefined,
+      subject: getEmailSubject(lead),
       text,
-      html: createEmailHtml(lead),
+      html: createEmailHtml(lead, submittedAt),
     },
     sms: {
       to: getEnvironmentValue("LEAD_RECIPIENT_PHONE", "TEXT_NOTIFICATION_NUMBER") ?? business.notificationRecipients.sms,
@@ -114,58 +161,35 @@ async function ensureResponse(response: Response, provider: string) {
 }
 
 async function sendResend(email: NotificationEmail, apiKey: string) {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: email.from, to: [email.to], subject: email.subject, html: email.html, text: email.text }),
-    signal: AbortSignal.timeout(requestTimeoutMs),
+  const resend = new Resend(apiKey);
+  const { data, error } = await resend.emails.send({
+    from: email.from,
+    to: [email.to],
+    replyTo: email.replyTo,
+    subject: email.subject,
+    html: email.html,
+    text: email.text,
   });
-  await ensureResponse(response, "Resend email");
-}
-
-async function sendSendGrid(email: NotificationEmail, apiKey: string) {
-  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      personalizations: [{ to: [{ email: email.to }] }],
-      from: { email: email.from },
-      subject: email.subject,
-      content: [
-        { type: "text/plain", value: email.text },
-        { type: "text/html", value: email.html },
-      ],
-    }),
-    signal: AbortSignal.timeout(requestTimeoutMs),
-  });
-  await ensureResponse(response, "SendGrid email");
-}
-
-function resolveEmailProvider(): EmailProvider | undefined {
-  const configured = getEnvironmentValue("EMAIL_PROVIDER")?.toLowerCase();
-  if (configured === "resend" || configured === "sendgrid") return configured;
-  if (configured) return undefined;
-  if (getEnvironmentValue("RESEND_API_KEY")) return "resend";
-  if (getEnvironmentValue("SENDGRID_API_KEY")) return "sendgrid";
-  return undefined;
+  if (error) {
+    console.error("[lead-notification:resend-rejected]", {
+      code: error.name,
+      status: error.statusCode,
+    });
+    throw new ProviderRequestError("Resend email", error.statusCode ?? undefined);
+  }
+  if (!data?.id) {
+    console.error("[lead-notification:resend-rejected]", { code: "missing-message-id" });
+    throw new ProviderRequestError("Resend email");
+  }
 }
 
 async function sendEmail(email: NotificationEmail): Promise<NotificationChannelResult> {
-  const requestedProvider = getEnvironmentValue("EMAIL_PROVIDER")?.toLowerCase();
-  const provider = resolveEmailProvider();
-
-  if (requestedProvider && !provider) return { channel: "email", status: "failed" };
-  if (!provider) return { channel: "email", status: "not-configured" };
-
-  const apiKey = provider === "resend"
-    ? getEnvironmentValue("RESEND_API_KEY")
-    : getEnvironmentValue("SENDGRID_API_KEY");
-
-  if (!apiKey || !email.from || !email.to) return { channel: "email", provider, status: "not-configured" };
+  const provider = "resend" as const;
+  const apiKey = getEnvironmentValue("RESEND_API_KEY");
+  if (!apiKey || !email.to) return { channel: "email", provider, status: "not-configured" };
 
   try {
-    if (provider === "resend") await sendResend(email, apiKey);
-    else await sendSendGrid(email, apiKey);
+    await sendResend(email, apiKey);
     return { channel: "email", provider, status: "delivered" };
   } catch {
     return { channel: "email", provider, status: "failed" };
@@ -216,20 +240,18 @@ async function sendSms(sms: NotificationSms): Promise<NotificationChannelResult>
 }
 
 /**
- * A submission succeeds only after at least one configured provider accepts it.
- * No database persistence is implied; if every channel is unavailable or fails,
+ * A submission succeeds only after Resend accepts the notification email.
+ * No database persistence is implied; if email delivery is unavailable or fails,
  * the route returns an error so the browser retains the customer's form values.
  */
 export async function sendLeadNotifications(lead: EstimateLead): Promise<NotificationDeliveryReport> {
   const payloads = createNotificationPayloads(lead);
   const [email, sms] = await Promise.all([sendEmail(payloads.email), sendSms(payloads.sms)]);
 
-  if (email.status === "delivered" || sms.status === "delivered") {
-    return { delivered: true, email, sms };
+  if (email.status !== "delivered") {
+    const reason = email.status === "not-configured" ? "not-configured" : "delivery-failed";
+    throw new LeadDeliveryError(reason, email, sms);
   }
 
-  const reason = email.status === "not-configured" && sms.status === "not-configured"
-    ? "not-configured"
-    : "delivery-failed";
-  throw new LeadDeliveryError(reason, email, sms);
+  return { delivered: true, email, sms };
 }

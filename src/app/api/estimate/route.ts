@@ -24,6 +24,9 @@ function hasAllowedOrigin(request: Request) {
 
 export async function POST(request: Request) {
   if (!hasAllowedOrigin(request)) return json({ error: "Invalid request origin." }, 403);
+  if (request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase() !== "application/json") {
+    return json({ error: "Content type must be application/json." }, 415);
+  }
 
   const contentLength = Number(request.headers.get("content-length") ?? "0");
   if (Number.isFinite(contentLength) && contentLength > maxBodyBytes) return json({ error: "Request is too large." }, 413);
@@ -34,9 +37,20 @@ export async function POST(request: Request) {
     return json({ error: "Too many requests. Please try again shortly." }, 429, { "Retry-After": String(rateLimit.retryAfterSeconds) });
   }
 
+  let rawBody: string;
+  try {
+    rawBody = await request.text();
+  } catch {
+    return json({ error: "Unable to read request body." }, 400);
+  }
+
+  if (new TextEncoder().encode(rawBody).byteLength > maxBodyBytes) {
+    return json({ error: "Request is too large." }, 413);
+  }
+
   let payload: unknown;
   try {
-    payload = await request.json();
+    payload = JSON.parse(rawBody);
   } catch {
     return json({ error: "Invalid JSON request body." }, 400);
   }
@@ -47,8 +61,9 @@ export async function POST(request: Request) {
   // Return a generic accepted response for bots without exposing the honeypot check.
   if (validation.data.website) return json({ status: "success" }, 201);
 
-  const elapsed = Date.now() - validation.data.formStartedAt;
-  if (elapsed < minimumHumanFillTimeMs || validation.data.formStartedAt > Date.now() + 60_000) {
+  const now = Date.now();
+  const elapsed = now - validation.data.formStartedAt;
+  if (validation.data.formStartedAt <= 0 || elapsed < minimumHumanFillTimeMs || validation.data.formStartedAt > now + 60_000) {
     return json({ error: "Please wait a moment and try again." }, 422);
   }
 

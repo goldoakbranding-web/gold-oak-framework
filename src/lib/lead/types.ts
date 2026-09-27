@@ -6,17 +6,18 @@ export type EstimateLead = {
   serviceNeeded: string;
   preferredContact: string;
   projectDetails: string;
+  consent: boolean;
 };
 
 export type EstimateLeadInput = EstimateLead & {
-  consent: boolean;
   website: string;
   formStartedAt: number;
 };
 
 export type NotificationEmail = {
   to: string;
-  from?: string;
+  from: string;
+  replyTo?: string;
   subject: string;
   text: string;
   html: string;
@@ -29,7 +30,7 @@ export type NotificationSms = {
 
 export type NotificationChannelResult = {
   channel: "email" | "sms";
-  provider?: "resend" | "sendgrid" | "twilio";
+  provider?: "resend" | "twilio";
   status: "delivered" | "not-configured" | "failed";
 };
 
